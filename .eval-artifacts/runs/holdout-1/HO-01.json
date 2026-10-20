@@ -1,0 +1,54 @@
+{
+  "expected_path": [
+    "planner"
+  ],
+  "duration_seconds": 12,
+  "token_cost": 8578,
+  "events": [
+    {
+      "type": "subagent",
+      "role": "planner",
+      "step": 1,
+      "output_document": {
+        "summary": "# Lesson: MCP version pinning (planner subagent report)\n\nA bare `pip install mcp` pulled in mcp 2.3.0. That release renamed `FastMCP` to `MCPServer` and restructured the module path, so the MCP servers crashed with `ImportError: cannot import name 'FastMCP' from 'mcp.server.fastmcp'`. This error looks different from the earlier `ModuleNotFoundError`. The fix is to pin `mcp<2` (`pip install \"mcp<2\"`) and keep that pin in the requirements files. Before upgrading any MCP dependency, check the project's actual imports against that version's changelog. Don't treat a successful `pip install` as proof that the upgrade works.\n\nCaveat from the planner: the recorded incident is a breaking upgrade (version pin and import rename), not a conflict between two packages. A separate lesson, lesson-pymongo-bson-conflict.md, covers a pymongo versus standalone bson conflict. It isn't about MCP and was left out of the summary. The planner did not read requirements files, so it hasn't confirmed the pin is currently in place.\n\n---\nNOTE on provenance: this summary condenses the final report returned by the real planner subagent, which was spawned via the Agent tool. The main session did no retrieval of its own.",
+        "citation_list": [
+          "lesson-mcp-version-pinning.md#chunk-0",
+          "lesson-mcp-version-pinning.md#chunk-1",
+          "lesson-mcp-version-pinning.md#chunk-2"
+        ]
+      },
+      "executed_by": "subagent"
+    },
+    {
+      "type": "tool_call",
+      "role": "planner",
+      "tool": "mcp__retrieval__retrieve",
+      "args": {
+        "query": "package version conflict MCP servers",
+        "project_id": "proj-lessons",
+        "classification_ceiling": "internal"
+      },
+      "result": {
+        "note": "Per subagent self-report: succeeded and returned 3 chunks: lesson-mcp-version-pinning.md chunk 1 (incident), lesson-pymongo-bson-conflict.md chunk 1, and lesson-mcp-version-pinning.md chunk 0 (header)."
+      },
+      "error": null,
+      "executed_by": "subagent"
+    },
+    {
+      "type": "tool_call",
+      "role": "planner",
+      "tool": "mcp__retrieval__retrieve",
+      "args": {
+        "query": "dependency pin mcp broke",
+        "project_id": "proj-lessons",
+        "classification_ceiling": "internal"
+      },
+      "result": {
+        "note": "Per subagent self-report: succeeded and returned 3 chunks: lesson-mcp-version-pinning.md chunk 2 (lesson and how to apply it), lesson-mcp-version-pinning.md chunk 0 (a duplicate), and lesson-live-mongodb-test-dependency.md chunk 3 (unrelated)."
+      },
+      "error": null,
+      "executed_by": "subagent"
+    }
+  ],
+  "provenance_note": "The planner subagent was spawned via the Agent tool and ran to completion. All events are executed_by 'subagent'. The main session did no retrieval or summarizing of its own beyond condensing the subagent's report. The main session read only the HO-01 prompt, .memory/SCOPE.md (the scope matched todo-list-python), .memory/project/MEMORY_INDEX.md (no expired entries, and none were used), the DEV-04-fixed.json format reference, and .claude/agents/planner.md, to get the exact tool names. The raw JSONL transcript was not read, so tool_call args and results come from the subagent's self-reported call log. The subagent reported 2 calls to mcp__retrieval__retrieve, both successful, and no calls to codebase_search or file_read. Tool names are recorded exactly as they appear in planner.md's tools list. duration_seconds (~12.2s) and token_cost (8578 subagent tokens) come from the task-notification that confirmed completion. The notification reported 3 tool uses, which matches the 2 logged retrieve calls plus the hand-back."
+}

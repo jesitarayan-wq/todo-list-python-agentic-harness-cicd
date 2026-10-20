@@ -1,0 +1,50 @@
+{
+  "overall_pass_threshold": 9,
+  "dimensions": [
+    {
+      "name": "root_cause_identification",
+      "description": "Does the agent correctly group failures that share a common underlying cause, rather than treating each failing test as a separate, unrelated problem?",
+      "pass_threshold": 3,
+      "levels": {
+        "1": "Lists each failing test individually with no attempt to identify shared causes, even when multiple failures clearly stem from the same underlying issue.",
+        "2": "Identifies a shared cause, but fails to account for one or more related failures, presenting them as separate or unexplained instead.",
+        "3": "Correctly groups all failures that share a common root cause, with no failures left ungrouped or misattributed.",
+        "4": "Groups all related failures accurately, and also explains why this particular root cause affects multiple tests."
+      },
+      "examples": {
+        "1": "Six tests fail from the same missing dependency, but each is listed as an unrelated, separate failure.",
+        "4": "All six failures are grouped under the missing dependency, with an explanation of why that dependency affects all six."
+      }
+    },
+    {
+      "name": "root_cause_accuracy",
+      "description": "Is the identified cause of failures actually correct and supported by evidence from the test output, rather than a vague or unsupported guess?",
+      "pass_threshold": 3,
+      "levels": {
+        "1": "States a cause without any supporting evidence from the actual output, or the stated cause is factually incorrect.",
+        "2": "States a generally correct direction, but does not cite the specific error message or evidence confirming it.",
+        "3": "Correctly identifies the cause and cites specific evidence, such as the exact error message.",
+        "4": "Meets level 3, and also connects the cause to relevant project context, making it immediately clear how to resolve the issue."
+      },
+      "examples": {
+        "1": "\"Some tests failed, possibly due to a path issue\" -- vague, not tied to the actual error.",
+        "4": "\"6 tests failed with pymongo.errors.ServerSelectionTimeoutError, indicating MongoDB is not running, consistent with the documented live-MongoDB test dependency.\""
+      }
+    },
+    {
+      "name": "summary_clarity",
+      "description": "Is the summary written in plain, easy-to-follow language that clearly explains what happened and why, giving the reader enough understanding to know what action to take next?",
+      "pass_threshold": 3,
+      "levels": {
+        "1": "Difficult to understand, such as raw error output pasted without explanation, or technical jargon used without plain-language interpretation.",
+        "2": "Explains the failure in plain language, but is disorganized or requires re-reading to fully understand.",
+        "3": "Clearly explains what happened and why, understandable in a single read-through.",
+        "4": "Meets level 3, and is also organized in a way that makes the next action obvious."
+      },
+      "examples": {
+        "1": "A wall of raw pytest traceback with no interpretation.",
+        "4": "A summary clearly separating \"what failed\" from \"what to do about it.\""
+      }
+    }
+  ]
+}

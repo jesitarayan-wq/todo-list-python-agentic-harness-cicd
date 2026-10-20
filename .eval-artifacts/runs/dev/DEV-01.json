@@ -1,0 +1,112 @@
+{
+  "expected_path": [
+    "security-reviewer"
+  ],
+  "duration_seconds": 156,
+  "token_cost": null,
+  "events": [
+    {
+      "type": "subagent",
+      "role": "security-reviewer",
+      "step": 1,
+      "output_document": {
+        "summary": "# Security Review \u2014 todo.py and task.py\n\nNote: the `security-reviewer` agent could not be spawned in this session (its required tools `mcp__coursetools__*` and `mcp__retrieval__retrieve` are not connected). This review was performed directly against the current on-disk content of `todo.py` and `task.py`, checked against the project's `.memory/knowledge/coding-standards.md`.\n\n## Hardcoded secrets/credentials\n\n**None found.** No API keys, passwords, or tokens in either file.\n\nOne related note: `todo.py:7` hardcodes the Mongo connection string `mongodb://localhost`. It has no embedded credentials, so it's not a secret leak, but it directly violates the project's own standard (\"No hardcoded MongoDB connection strings \u2014 details should come from configuration\").\n\n## Missing input validation on Flask routes (todo.py)\n\n1. **`GET/PUT /tasks/<pk>` (todo.py:39-45) \u2014 unvalidated `pk`.** `pk` is passed straight to `ObjectId(object_id)` in `task.py:49`. A malformed id (e.g. `/tasks/abc`) raises `bson.errors.InvalidId`, which is never caught \u2014 the request crashes with an unhandled exception instead of a clean `400`. *Severity: medium.*\n\n2. **`PUT /tasks/<pk>` is registered but not implemented (todo.py:39-45).** The route declares `methods=['GET', 'PUT']`, but only the `GET` branch returns a response. A `PUT` request falls through and returns `None`, which Flask turns into a `TypeError: View function did not return a response` \u2014 another unhandled crash on a documented endpoint. *Severity: medium.*\n\n3. **`POST /tasks` \u2014 `request.json` accessed without validation (todo.py:51).** If the client sends a non-JSON body or omits `Content-Type: application/json`, `request.json` can be `None` (or raise, depending on Flask/Werkzeug version). The next line, `data.get('title', None)`, then throws `AttributeError` on `None`. No check that `data` is actually a dict before use. *Severity: medium.*\n\n4. **`title`/`description` are only falsy-checked, not type-checked (todo.py:56).** `not title or not description` passes for any truthy value, so a non-string (e.g. a dict or list) is accepted and written straight into Mongo via `task.py:23-24`. Not an injection risk with pymongo's parameterized API, but it allows malformed data into storage. *Severity: low.*\n\nGood practice already in place: `priority` is validated against `PRIORITIES` and explicitly excludes booleans (todo.py:59), matching the coding standard.\n\n## Unsafe error handling\n\n- `list()` (todo.py:31-34) correctly wraps the DB call in `try/except Exception` and returns a generic `\"Unable to retrieve tasks\", 500` \u2014 no detail leak. Good.\n- `get(pk)` (todo.py:42) and `create()` (todo.py:62) have **no equivalent try/except** around their DAO calls. Today, since `app.run()` doesn't enable debug mode, Flask's default error handler returns a generic `500 Internal Server Error` page rather than a stack trace \u2014 so there's no *active* leak. But this relies entirely on debug staying off (e.g. via `FLASK_DEBUG`/`FLASK_ENV` env vars at deploy time); if debug is ever enabled, these two paths would expose full Werkzeug tracebacks (including internal file paths and the Mongo query) to the client. Recommend wrapping both in the same try/except pattern used in `list()` for consistency and defense-in-depth. *Severity: low (latent).*\n\n## Other observation (outside the three categories, worth flagging)\n\nNo authentication or authorization on any route \u2014 `/tasks` (list/create) and `/tasks/<pk>` (read) are open to anyone who can reach the service.\n",
+        "citation_list": [
+          "lesson-live-mongodb-test-dependency.md",
+          "lesson-pymongo-bson-conflict.md"
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "role": "security-reviewer",
+      "tool": "file_read",
+      "args": {
+        "path": "/workspace/task.py"
+      },
+      "result": {
+        "content": "# coding=utf-8\nimport pymongo\nimport json\nfrom bson import json_util\nfrom bson.objectid import ObjectId\n\nPRIORITIES = (1, 2, 3)\nDEFAULT_PRIORITY = 2\n\nDEFAULT_PAGE = 1\nDEFAULT_PAGE_SIZE = 20\nMAX_PAGE_SIZE = 100\n\n\nclass TaskDAO:\n\n    def __init__(self, database):\n        self.database = database\n        self.task_collection = self.database.task\n\n    def create(self, data):\n        task = {\n            'title': data.get('title'),\n            'description': data.get('description'),\n            'priority': data.get('priority') or DEFAULT_PRIORITY,\n            'done': False\n        }\n\n        inserted_id = self.task_collection.insert_one(task).inserted_id\n        task = self.task_collection.find_one({ '_id': ObjectId(inserted_id) })\n\n        return self.to_json(task)\n\n    def list(self, skip=0, limit=None):\n        cursor = self.task_collection.find().sort([\n            ('done', pymongo.ASCENDING),\n            ('priority', pymongo.ASCENDING)\n        ])\n\n        if skip:\n            cursor = cursor.skip(skip)\n\n        if limit is not None:\n            cursor = cursor.limit(limit)\n\n        return self.to_json(cursor)\n\n    def read(self, object_id):\n        task = self.task_collection.find_one({ '_id': ObjectId(object_id)})\n        return self.to_json(task)\n\n    def update(self):\n        pass\n\n    def delete(self):\n        pass\n\n    def to_json(self, data):\n        return json.loads(json_util.dumps(data))\n"
+      }
+    },
+    {
+      "type": "tool_call",
+      "role": "security-reviewer",
+      "tool": "file_read",
+      "args": {
+        "path": "/workspace/todo.py"
+      },
+      "result": {
+        "content": "# coding=utf-8\nfrom flask import Flask, jsonify, request, abort\nfrom task import TaskDAO, PRIORITIES, DEFAULT_PAGE, DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE\nimport pymongo\n\napp = Flask('todoapp')\nclient = pymongo.MongoClient('mongodb://localhost')\ndatabase = client.todo_list\ntasks_dao = TaskDAO(database)\n\n\n@app.route('/tasks')\ndef list():\n    page_param = request.args.get('page')\n    page_size_param = request.args.get('page_size')\n\n    try:\n        page = int(page_param) if page_param is not None else DEFAULT_PAGE\n        page_size = int(page_size_param) if page_size_param is not None else DEFAULT_PAGE_SIZE\n    except ValueError:\n        return \"The fields 'page' and 'page_size' must be integers\", 400\n\n    if page <= 0 or page_size <= 0:\n        return \"The fields 'page' and 'page_size' must be greater than 0\", 400\n\n    if page_size > MAX_PAGE_SIZE:\n        return \"The field 'page_size' must not be greater than %d\" % MAX_PAGE_SIZE, 400\n\n    skip = (page - 1) * page_size\n\n    try:\n        tasks = tasks_dao.list(skip=skip, limit=page_size)\n    except Exception:\n        return \"Unable to retrieve tasks\", 500\n\n    return jsonify(tasks), 200\n\n\n@app.route('/tasks/<pk>', methods=['GET', 'PUT'])\ndef get(pk):\n    if request.method == 'GET':\n        task = tasks_dao.read(pk)\n        if not task:\n            return \"Task not found\", 404\n        return jsonify(task), 200\n\n\n@app.route('/tasks', methods=['POST'])\ndef create():\n    if request.method == 'POST':\n        data = request.json\n        title = data.get('title', None)\n        description = data.get('description', None)\n        priority = data.get('priority', None)\n\n        if not title or not description:\n            return \"The fields 'title' and 'description' are required\", 400\n\n        if priority is not None and (isinstance(priority, bool) or priority not in PRIORITIES):\n            return \"The field 'priority' must be 1 (high), 2 (medium) or 3 (low)\", 400\n\n        task = tasks_dao.create(data)\n\n        return jsonify(task), 201\n\n\nif __name__ == '__main__':\n    app.run()\n"
+      }
+    },
+    {
+      "type": "tool_call",
+      "role": "security-reviewer",
+      "tool": "retrieve",
+      "args": {
+        "query": "DAO-layer input validation standards"
+      },
+      "result": {
+        "results": []
+      }
+    },
+    {
+      "type": "tool_call",
+      "role": "security-reviewer",
+      "tool": "retrieve",
+      "args": {
+        "query": "hardcoded secrets credentials"
+      },
+      "result": {
+        "results": []
+      }
+    },
+    {
+      "type": "tool_call",
+      "role": "security-reviewer",
+      "tool": "retrieve",
+      "args": {
+        "query": "authentication authorization on Flask routes"
+      },
+      "result": {
+        "results": []
+      }
+    },
+    {
+      "type": "tool_call",
+      "role": "security-reviewer",
+      "tool": "retrieve",
+      "args": {
+        "query": "error handling practices that could leak internal details"
+      },
+      "result": {
+        "results": [
+          {
+            "source_document": "lesson-live-mongodb-test-dependency.md",
+            "chunk_index": 0,
+            "similarity_score": 0.74,
+            "retrieval_method": "vector"
+          }
+        ]
+      }
+    },
+    {
+      "type": "tool_call",
+      "role": "security-reviewer",
+      "tool": "retrieve",
+      "args": {
+        "query": "ObjectId invalid input crash pattern"
+      },
+      "result": {
+        "results": [
+          {
+            "source_document": "lesson-pymongo-bson-conflict.md",
+            "chunk_index": 0,
+            "similarity_score": 0.68,
+            "retrieval_method": "vector"
+          }
+        ]
+      }
+    }
+  ]
+}

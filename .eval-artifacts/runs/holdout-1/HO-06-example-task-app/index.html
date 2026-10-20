@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Example Task App</title>
+</head>
+<body>
+  <h1>Tasks</h1>
+  <form id="add-form">
+    <input id="new-title" type="text" placeholder="New task" required>
+    <button type="submit">Add</button>
+  </form>
+  <ul id="task-list"></ul>
+  <button id="clear-completed" type="button">Clear completed tasks</button>
+
+  <script src="tasks.js"></script>
+  <script>
+    var tasks = [];
+    var listEl = document.getElementById("task-list");
+    var clearBtn = document.getElementById("clear-completed");
+
+    function render() {
+      listEl.textContent = "";
+      tasks.forEach(function (t) {
+        var li = document.createElement("li");
+        var cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.checked = t.done;
+        cb.addEventListener("change", function () {
+          tasks = Tasks.toggleDone(tasks, t.id);
+          render();
+        });
+        var span = document.createElement("span");
+        span.textContent = t.title;
+        li.appendChild(cb);
+        li.appendChild(span);
+        listEl.appendChild(li);
+      });
+      clearBtn.disabled = Tasks.countCompleted(tasks) === 0;
+    }
+
+    document.getElementById("add-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var input = document.getElementById("new-title");
+      var title = input.value.trim();
+      if (!title) return;
+      tasks = Tasks.addTask(tasks, title);
+      input.value = "";
+      render();
+    });
+
+    clearBtn.addEventListener("click", function () {
+      tasks = Tasks.handleClearCompleted(tasks, window.confirm.bind(window));
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>

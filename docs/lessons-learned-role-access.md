@@ -1,0 +1,15 @@
+# Lessons Learned Workflow: Role Access Configuration
+
+This document records the storage and retrieval MCP access granted to each subagent role for the proj-lessons Lessons Learned workflow, and the reasoning behind each decision. Access is enforced through each role's `tools`/`disallowedTools` frontmatter in `.claude/agents/`, not merely described in instructions.
+
+| Role | Storage access | Retrieval access | Classification ceiling | Why |
+|---|---|---|---|---|
+| **Planner** | None (write_entry/update_entry/delete_entry explicitly denied) | `mcp__retrieval__retrieve` only | internal | Must retrieve relevant prior lessons before proposing an approach, so its plan accounts for known pitfalls. Has no legitimate reason to write a lesson itself -- that responsibility belongs to the Implementer, keeping the single write-capable role for new lessons unambiguous. |
+| **Implementer** | `mcp__storage__write_entry` only (read_entry/update_entry/delete_entry/retrieve explicitly denied) | None | internal (enforced server-side; the server itself also rejects confidential/secret writes regardless of caller) | Is the role actually doing hands-on work and best positioned to notice a new, durable lesson worth recording. Deliberately cannot read, update, or delete existing entries, nor retrieve from the corpus -- its only storage-related capability is to add exactly one new thing, keeping the write path narrow, auditable, and easy to reason about. |
+| **Security Reviewer** | None (write_entry/update_entry/delete_entry explicitly denied) | `mcp__retrieval__retrieve` only | internal | Retrieves relevant standards and prior lessons while evaluating the Implementer's work, so findings can reference established precedent. Has no legitimate reason to write to storage. |
+| **Tester** | None | None | N/A | The Tester's bounded responsibility (run tests, report pass/fail) does not require historical project knowledge or the ability to record new lessons; narrowing its access keeps its context focused on test execution alone. |
+| **Project Manager** | None (does not use the proj-lessons storage server; owns only the course's task_tracker tool from the coursetools server, unchanged from the original Module 3 Lesson 1 design) | None | N/A | Its bounded responsibility (update the ticket) has no relationship to the Lessons Learned corpus or storage entries; granting it either capability would widen its action space with no corresponding need. |
+
+## Enforcement note
+
+All of the above is enforced through each agent definition's `tools` allow-list and explicit `disallowedTools` deny-list in `.claude/agents/`, following the same allow-list-as-primary-mechanism discipline established in Module 3 Lesson 1. No role's instructions alone are relied upon to prevent an out-of-scope action; where a role should not have a capability, that capability is either absent from `tools` entirely or explicitly listed in `disallowedTools`, matching the server-side enforcement verified in Module 3 Lesson 2 (harness allow-list absence, independent server-side authorization check).

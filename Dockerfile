@@ -96,6 +96,9 @@ COPY skills/ /root/.claude/skills/
 
 RUN mkdir -p /root/.claude/agents
 COPY agents/ /root/.claude/agents/
+COPY settings.json /root/.claude/settings.json
+COPY statusline.sh /root/.claude/statusline.sh
+RUN chmod +x /root/.claude/statusline.sh
 
 # --- Module 4 workspace content ---
 # Copy source files into the image so the environment works without a bind-mount.

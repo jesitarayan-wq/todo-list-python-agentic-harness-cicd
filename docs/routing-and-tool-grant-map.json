@@ -1,0 +1,8 @@
+{
+  "planner": ["file_read", "codebase_search", "retrieve"],
+  "implementer": ["file_read", "file_write", "codebase_search", "write_entry"],
+  "security-reviewer": ["file_read", "codebase_search", "retrieve"],
+  "tester": ["file_read", "test_runner"],
+  "project-manager": ["task_tracker"],
+  "test-coverage-analyzer": ["Read", "Grep", "Glob"]
+}

@@ -1,4 +1,89 @@
-# CLAUDE.md
+# Agent Instructions
+
+## Memory Configuration
+
+At the start of every session, read .memory/project/MEMORY_INDEX.md
+to orient yourself. Then read any active entries listed there that
+are relevant to the current task.
+
+Before making any significant decision or observing something worth
+remembering across sessions, check the index for an existing entry
+on the same topic. Update existing entries rather than creating
+duplicates.
+
+### Memory layers
+
+- .memory/project/ -- Read on startup via MEMORY_INDEX.md. You may
+  write new entries here when a significant decision is made or
+  project state changes.
+
+- .memory/knowledge/ -- Read-only. Consult before making any decision
+  that touches coding standards or architectural constraints. Never
+  attempt to write to this directory.
+
+- .memory/reference/ -- Read-only. Query by keyword for relevant
+  excerpts when you need background context. Do not read the entire
+  directory.
+
+### Write policy
+
+Before writing any content to a memory file, classify it:
+- If it is Public or Internal: proceed with writing
+- If it is Confidential: do not write it to memory. Note in your
+  response that the information was not stored and explain where
+  it should be retrieved from instead.
+- If it is Secret (credential, token, API key, PII): do not write
+  it anywhere. Use it for the immediate task only. If you find a
+  secret already written in a memory file, flag it immediately and
+  do not proceed until a human removes it.
+
+Before writing a new memory entry, check MEMORY_INDEX.md for an
+existing entry on the same topic. Update existing entries rather
+than creating new ones. Never write anything classified as
+Confidential or Secret to any memory layer.
+
+### Stale memory policy
+
+Before acting on any memory entry, check its review date.
+If the review date has passed:
+1. Do not act on that entry until a human confirms it
+  is still accurate
+2. State clearly in your response: "Memory entry
+  [filename] has a review date of [date], which has
+  passed. Please confirm this is still current before
+  I proceed."
+3. Wait for confirmation before using the entry
+
+This applies to all entries in .memory/project/.
+Knowledge files do not have review dates and are
+maintained by humans directly.
+
+### Scope verification
+
+Read SCOPE.md at the root of .memory/ on startup. If it does not
+match this project, halt and report the mismatch before doing
+anything else.
+
+### Pre-commit credential scan
+
+A pre-commit hook at .git/hooks/pre-commit scans .memory/ for common
+credential patterns (sk-, password=, secret=, token=, api_key=,
+apikey=) and blocks the commit if any are found.
+
+
+<!-- Scope verification confirmed working correctly via Failure Mode 2 testing on 2026-10-01; no strengthening was required, as the existing check caught the deliberate mismatch on first attempt. See docs/iteration-log-memory.md for full test record. -->
+
+
+---
+
+# Project and environment (Module 4 infrastructure)
+
+## This project
+
+Target codebase: todo-list-python (Flask + MongoDB to-do API: todo.py, task.py, tests/).
+Agents live in .claude/agents/ (orchestrator, planner, implementer, security-reviewer, tester, project-manager, test-coverage-analyzer).
+MCP servers: mcp/ (project servers, registered in .mcp.json) and mcp-servers/ (Module 4 governed servers, to be reconciled in Lesson 1).
+Eval harness: eval/ (test_deterministic.py has 11 checks; rubric in eval/rubric.json). Calibration history: docs/calibration-log.md.
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 

@@ -1,0 +1,66 @@
+{
+  "expected_path": [
+    "planner",
+    "implementer",
+    "security-reviewer",
+    "tester"
+  ],
+  "duration_seconds": 82,
+  "token_cost": 36300,
+  "token_cost_note": "Approximate sum of known subagent tokens (about 12700 + 10600 + 13000 = 36300). tester's token count is unknown and is not included.",
+  "events": [
+    {
+      "type": "subagent",
+      "role": "planner",
+      "step": 1,
+      "output_document": {
+        "summary": "planner subagent completed. Per its on-screen completion notice: 29s, about 12700 tokens, 7 tool calls plus hand-back, no errors. The plan content itself was not captured in the record source.",
+        "citation_list": []
+      },
+      "duration_seconds": 29,
+      "tokens": 12700,
+      "error": null,
+      "executed_by": "subagent"
+    },
+    {
+      "type": "subagent",
+      "role": "implementer",
+      "step": 2,
+      "output_document": {
+        "summary": "implementer subagent completed. Per its on-screen completion notice: 24s, about 10600 tokens, 5 tool calls plus hand-back, no errors. It created three files, all under example-task-app/: index.html, tasks.js and tests/tasks.test.js. It saved one lesson. File evidence is in HO-06-files.md and HO-06-example-task-app/.",
+        "citation_list": []
+      },
+      "duration_seconds": 24,
+      "tokens": 10600,
+      "error": null,
+      "executed_by": "subagent"
+    },
+    {
+      "type": "subagent",
+      "role": "security-reviewer",
+      "step": 3,
+      "output_document": {
+        "summary": "security-reviewer subagent completed. Per its on-screen completion notice: 21s, about 13000 tokens, 6 tool calls plus hand-back, no errors. It approved the change.",
+        "citation_list": []
+      },
+      "duration_seconds": 21,
+      "tokens": 13000,
+      "error": null,
+      "executed_by": "subagent"
+    },
+    {
+      "type": "subagent",
+      "role": "tester",
+      "step": 4,
+      "output_document": {
+        "summary": "tester subagent completed. Per its on-screen completion notice: 8s, tokens unknown. test_runner returned only a canned PASS, so the 9 new tests were NOT actually verified. This run must not be read as evidence that the tests pass.",
+        "citation_list": []
+      },
+      "duration_seconds": 8,
+      "tokens": null,
+      "error": null,
+      "executed_by": "subagent"
+    }
+  ],
+  "provenance_note": "This record was RECONSTRUCTED AFTER THE SESSION EXITED from on-screen completion notices. The original session ran planner, implementer, security-reviewer and tester as real subagents in that order, but it ended before writing this record. No tool_call events are logged: the individual calls were not captured, so none were invented. The repair session spawned no subagents and did not edit or run anything in the repo to build this record. Every subagent event has executed_by 'subagent' and error null. duration_seconds is the sum of the four agent durations (29 + 24 + 21 + 8 = 82). token_cost is approximate: the sum of known tokens (about 12700 + 10600 + 13000 = 36300); tester's tokens are unknown (recorded as null) and are not included. The tester's test_runner returned only a canned PASS, so the 9 new tests were not verified. File evidence is in HO-06-files.md and HO-06-example-task-app/."
+}

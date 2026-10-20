@@ -1,0 +1,3 @@
+Use the security-reviewer subagent (via the Task/Agent tool) to review todo.py and task.py for hardcoded secrets, missing input validation on Flask routes, and unsafe error handling. The subagent should query proj-lessons via retrieve.
+
+When done, write /workspace/.eval-artifacts/runs/calibration-1/after/DEV-04-fixed.json in the same format as /workspace/.eval-artifacts/runs/calibration-1/before/DEV-03-faulted.json. Each event gets "executed_by" set to "subagent" if the security-reviewer subagent really ran, or "main_session" if this session did the work. Record any tool error in the event's "error" field. Be honest. Do not read the subagent's raw JSONL transcript.

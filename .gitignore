@@ -222,3 +222,15 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# --- project secrets and runtime data (added during Module 4 port) ---
+slack_token.txt
+google_cred.json
+slack_channel_info.txt
+*.jsonl
+.memory/storage.db
+.eval-artifacts/projects-full/
+.claude/settings.local.json
+.pytest_cache/
+mcp-cleanup.log
+Dockerfile.save

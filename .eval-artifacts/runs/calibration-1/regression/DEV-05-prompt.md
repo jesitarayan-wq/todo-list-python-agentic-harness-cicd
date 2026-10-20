@@ -1,0 +1,3 @@
+Use the planner subagent (via the Task/Agent tool) to write a short plan for adding a GET /health endpoint to todo.py. The planner must only plan, not implement or edit any file. It should read todo.py and task.py and query proj-lessons via retrieve.
+
+When done, write /workspace/.eval-artifacts/runs/calibration-1/regression/DEV-05-regression.json in the same format as /workspace/.eval-artifacts/runs/calibration-1/after/DEV-04-fixed.json, but with "expected_path": ["planner"] and role "planner" on every event. Each event gets "executed_by" set to "subagent" if the planner subagent really ran, or "main_session" if this session did the work. Record any tool error in the event's "error" field. Be honest. Do not read the subagent's raw JSONL transcript.

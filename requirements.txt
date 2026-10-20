@@ -22,7 +22,7 @@ PyYAML>=6.0
 # --- Module 4.2: Local MCP server development ---
 # FastMCP/MCP: build and run local MCP servers (storage + retrieval)
 fastmcp
-mcp
+mcp<2
 
 # SQLite async driver: persistent storage backend for the storage MCP server
 aiosqlite
@@ -50,3 +50,7 @@ rich
 typer
 # pytest: unit tests for MCP server logic
 pytest
+
+# --- todo-list-python app and harness (ported) ---
+pymongo
+sqlite-vec

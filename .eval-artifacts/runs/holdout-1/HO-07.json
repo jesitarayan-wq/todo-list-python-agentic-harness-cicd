@@ -1,0 +1,66 @@
+{
+  "expected_path": [
+    "planner",
+    "implementer",
+    "security-reviewer",
+    "tester"
+  ],
+  "duration_seconds": 102,
+  "token_cost": 39855,
+  "token_cost_note": "Sum of known subagent tokens (9847 + 18410 + 11598 = 39855). tester's token count is unknown and is not included.",
+  "events": [
+    {
+      "type": "subagent",
+      "role": "planner",
+      "step": 1,
+      "output_document": {
+        "summary": "planner subagent completed. Per its on-screen completion notice: 18.5s, 9847 tokens, 4 logged tool calls plus hand-back, no errors. The plan content itself was not captured in the record source.",
+        "citation_list": []
+      },
+      "duration_seconds": 18.5,
+      "tokens": 9847,
+      "error": null,
+      "executed_by": "subagent"
+    },
+    {
+      "type": "subagent",
+      "role": "implementer",
+      "step": 2,
+      "output_document": {
+        "summary": "implementer subagent completed. Per its on-screen completion notice: 40.8s, 18410 tokens, 7 logged tool calls plus hand-back, no errors. It also changed one existing test that used 'high' as its invalid priority value to 'urgent', because 'high' is now valid. The diff is in HO-07-diff.md.",
+        "citation_list": []
+      },
+      "duration_seconds": 40.8,
+      "tokens": 18410,
+      "error": null,
+      "executed_by": "subagent"
+    },
+    {
+      "type": "subagent",
+      "role": "security-reviewer",
+      "step": 3,
+      "output_document": {
+        "summary": "security-reviewer subagent completed. Per its on-screen completion notice: 28.7s, 11598 tokens, 3 logged tool calls plus hand-back, no errors. It approved the change. Its Critical and Warning findings were pre-existing and out of scope for this change.",
+        "citation_list": []
+      },
+      "duration_seconds": 28.7,
+      "tokens": 11598,
+      "error": null,
+      "executed_by": "subagent"
+    },
+    {
+      "type": "subagent",
+      "role": "tester",
+      "step": 4,
+      "output_document": {
+        "summary": "tester subagent completed. Per its on-screen completion notice: 14s, tokens unknown. The tester's test_runner is believed to return only placeholder PASS output, so the tests are UNVERIFIED. This run must not be read as evidence that the tests pass.",
+        "citation_list": []
+      },
+      "duration_seconds": 14,
+      "tokens": null,
+      "error": null,
+      "executed_by": "subagent"
+    }
+  ],
+  "provenance_note": "This record was RECONSTRUCTED AFTER THE SESSION EXITED from on-screen completion notices. The original session ran planner, implementer, security-reviewer and tester as real subagents in that order, but it ended before writing this record. No tool_call events are logged: the individual calls were not captured, so none were invented. The repair session spawned no subagents and did not edit or run anything in the repo to build this record. Every subagent event has executed_by 'subagent' and error null. duration_seconds is the sum of the four agent durations (18.5 + 40.8 + 28.7 + 14 = 102). token_cost is the sum of known tokens (9847 + 18410 + 11598 = 39855); tester's tokens are unknown (recorded as null) and are not included. The tester's test_runner is believed to return only placeholder PASS output, so the tests are unverified. The diff is in HO-07-diff.md."
+}
