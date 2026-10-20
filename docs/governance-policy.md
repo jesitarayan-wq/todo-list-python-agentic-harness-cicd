@@ -174,10 +174,10 @@ To widen access, open a pull request with: the proposed grant, a concrete justif
 | write_entry | storage | NO | Tester reports results but does not change stored state (NM-3). |
 | update_entry | storage | NO | Tester reports results but does not change stored state (NM-3). |
 | delete_entry | storage | NO | Tester must not remove project state (NM-3). |
-| read_entry | storage | NO | Not required; denied by default. |
-| list_entries | storage | NO | Not required; denied by default. |
+| read_entry | storage | YES | Tester reads decisions and test context. |
+| list_entries | storage | YES | Tester lists available state before reporting. |
 | audit_read | storage | NO | Audit inspection is owned by the orchestrator (NM-6). |
-| retrieve | retrieval | NO | Not required; denied by default. |
+| retrieve | retrieval | YES | Tester retrieves internal references for test context (ceiling internal). |
 
 ### Tool and path access
 
@@ -220,10 +220,10 @@ To widen access, open a pull request with: the proposed grant, a concrete justif
 | write_entry | storage | NO | Project-manager updates the ticket, not project state (NM-3). |
 | update_entry | storage | NO | Project-manager updates the ticket, not project state (NM-3). |
 | delete_entry | storage | NO | Must not remove project state (NM-3). |
-| read_entry | storage | NO | Not required; denied by default. |
-| list_entries | storage | NO | Not required; denied by default. |
+| read_entry | storage | YES | Project-manager reads state to report ticket status. |
+| list_entries | storage | YES | Project-manager lists state to report ticket status. |
 | audit_read | storage | NO | Audit inspection is owned by the orchestrator (NM-6). |
-| retrieve | retrieval | NO | Not required; denied by default. |
+| retrieve | retrieval | NO | Does not perform retrieval. |
 
 ### Tool and path access
 
@@ -309,12 +309,12 @@ To widen access, open a pull request with: the proposed grant, a concrete justif
 | Operation | Server | Granted | Justification / Denial reason |
 |---|---|---|---|
 | audit_read | storage | YES | Audit inspection is owned by the orchestrator (NM-6). Not yet enforced by the current servers. |
-| read_entry | storage | NO | Not required by the role; denied by default. |
-| list_entries | storage | NO | Not required by the role; denied by default. |
+| read_entry | storage | YES | Orchestrator reads state to coordinate subagents. |
+| list_entries | storage | YES | Orchestrator lists state to coordinate subagents. |
 | write_entry | storage | NO | Orchestrator must not change project state (NM-3). |
 | update_entry | storage | NO | Orchestrator must not change project state (NM-3). |
 | delete_entry | storage | NO | Must not remove project state (NM-3). |
-| retrieve | retrieval | NO | Not required; denied by default. |
+| retrieve | retrieval | NO | Course table says YES at confidential; kept NO and internal because this orchestrator has no retrieval tool and no confidential data. |
 
 ### Tool and path access
 
