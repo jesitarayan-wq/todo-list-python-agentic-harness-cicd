@@ -52,6 +52,9 @@ if [ "$MOUNT_MEMORY" -eq 1 ]; then
   ARGS+=( -v "$(pwd)/.memory:/memory:rw" )
 fi
 
+ARGS+=( -e OPENROUTER_API_KEY )
+ARGS+=( -v claude-auth:/claude-auth )
+ARGS+=( -v "$(pwd)/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh:ro" )
 # Role identity.
 ARGS+=( -e "AGENT_ROLE=${ROLE}" )
 

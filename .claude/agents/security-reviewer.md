@@ -12,7 +12,6 @@ tools:
   - mcp__coursetools__file_read
   - mcp__coursetools__codebase_search
   - mcp__retrieval__retrieve
-  - mcp__retrieval__does_not_exist
 disallowedTools:
   - mcp__coursetools__file_write
   - mcp__coursetools__shell

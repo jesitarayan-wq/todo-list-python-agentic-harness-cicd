@@ -71,3 +71,7 @@ the request appears.
 - Input format: the feature request and the repo path.
 - Output format: a final summary written to docs/run-summary.md.
 - Loops back to: subagents, per the branching logic above.
+
+## Skill activation scope
+
+Before letting any subagent use a skill (check-gmail, send-email, send-slack-message, rebuild-and-deploy, summarize-session), check docs/governance-policy.md. Every role currently has all five skills denied. If a role requests a skill its policy entry denies, refuse the request and append one line to logs/orchestrator-denials.log in the form: skill_activation_denied: <skill>, role: <role>.
