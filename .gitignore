@@ -234,3 +234,4 @@ slack_channel_info.txt
 .pytest_cache/
 mcp-cleanup.log
 Dockerfile.save
+logs/storage-store.json
