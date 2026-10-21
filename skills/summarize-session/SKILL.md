@@ -13,3 +13,7 @@ Include the following sections:
 
 **Next steps**
 - List any unfinished work, follow-up tasks, or open questions to address next session.
+
+## Activation Scope
+
+Denied roles: implementer, orchestrator, planner, security-reviewer, tester, project-manager, test-coverage-analyzer

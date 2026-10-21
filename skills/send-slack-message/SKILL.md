@@ -6,3 +6,7 @@ Steps:
 1. Use the Slack MCP server to look up the channel by name if needed.
 2. Post the message to the specified channel.
 3. Confirm to the user that the message was sent successfully, including the channel name.
+
+## Activation Scope
+
+Denied roles: implementer, orchestrator, planner, security-reviewer, tester, project-manager, test-coverage-analyzer

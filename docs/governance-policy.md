@@ -68,6 +68,7 @@ To widen access, open a pull request with: the proposed grant, a concrete justif
 **Level:** medium
 **Conditions for human checkpoint:** Before writing any file not named in the plan; before creating a new top-level directory; before changing anything under .memory/ (NM-3).
 **Reason:** Implementation is reversible in the container, but unrestricted write paths let the role change memory and project structure (NM-3).
+**Container permissions:** workspace read-write, memory mounted
 
 ## Role: planner
 
@@ -114,6 +115,8 @@ To widen access, open a pull request with: the proposed grant, a concrete justif
 **Level:** high
 **Conditions for human checkpoint:** None required, because the role is read-only. Any request to write a file or state escalates to the orchestrator.
 **Reason:** All planner tools are read-only (agent file).
+
+**Container permissions:** workspace read-only, memory omitted
 
 ## Role: security-reviewer
 
@@ -162,6 +165,8 @@ To widen access, open a pull request with: the proposed grant, a concrete justif
 **Conditions for human checkpoint:** Output is advisory only; any action beyond producing findings escalates to the orchestrator. The role name must match across the agent file, grant map and server allow-lists (NM-1).
 **Reason:** All reviewer tools are read-only (agent file).
 
+**Container permissions:** workspace read-only, memory omitted
+
 ## Role: tester
 
 **Version:** v1.0.0
@@ -207,6 +212,8 @@ To widen access, open a pull request with: the proposed grant, a concrete justif
 **Level:** medium
 **Conditions for human checkpoint:** A result must not be reported as a pass unless test_runner returned real test output (NM-4); any write to tracked files escalates.
 **Reason:** A gate that cannot fail gives false assurance (NM-4).
+
+**Container permissions:** workspace read-only, memory omitted
 
 ## Role: project-manager
 
@@ -254,6 +261,8 @@ To widen access, open a pull request with: the proposed grant, a concrete justif
 **Conditions for human checkpoint:** Setting a ticket to done when the tester's result was unverified (NM-4).
 **Reason:** Ticket status is the only state this role changes.
 
+**Container permissions:** workspace read-only, memory omitted
+
 ## Role: test-coverage-analyzer
 
 **Version:** v1.0.0
@@ -298,6 +307,8 @@ To widen access, open a pull request with: the proposed grant, a concrete justif
 **Level:** low
 **Conditions for human checkpoint:** Output is advisory only; any action beyond producing recommendations escalates to the orchestrator.
 **Reason:** Read-only role. The agent file declares no autonomy field, so this level is set by the policy, not copied from the file.
+
+**Container permissions:** workspace read-only, memory omitted
 
 ## Role: orchestrator
 
@@ -344,3 +355,4 @@ To widen access, open a pull request with: the proposed grant, a concrete justif
 **Level:** medium
 **Conditions for human checkpoint:** Before replacing a human escalation with an automatic fallback; any attempt to do a subagent's work itself (agent file); any write outside the run record.
 **Reason:** The orchestrator coordinates but must not substitute for a subagent (NM-1, NM-6).
+**Container permissions:** workspace read-write, memory mounted

@@ -9,3 +9,7 @@ Steps:
    - A 1-2 sentence summary of the key content or ask/action required
 3. Present the summaries as a numbered list, most recent first.
 4. At the end, report how many unread messages were found in total.
+
+## Activation Scope
+
+Denied roles: implementer, orchestrator, planner, security-reviewer, tester, project-manager, test-coverage-analyzer

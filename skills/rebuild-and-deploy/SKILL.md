@@ -24,3 +24,7 @@ Steps:
    ```
 5. If any push fails, report the error and remind the user to run `docker login` if they are not authenticated.
 6. On success, confirm the image is live and print the full image reference (e.g. `heatonresearch/agentic_engineer_4:3.0`).
+
+## Activation Scope
+
+Denied roles: implementer, orchestrator, planner, security-reviewer, tester, project-manager, test-coverage-analyzer

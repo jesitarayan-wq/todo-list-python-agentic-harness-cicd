@@ -9,3 +9,7 @@ Steps:
 1. Show the user a preview of the email (to, subject, body) and ask for confirmation before sending.
 2. Use the Gmail MCP server to send the email.
 3. Confirm to the user that the email was sent, including the recipient and subject.
+
+## Activation Scope
+
+Denied roles: implementer, orchestrator, planner, security-reviewer, tester, project-manager, test-coverage-analyzer
