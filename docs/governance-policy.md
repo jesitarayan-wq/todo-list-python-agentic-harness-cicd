@@ -34,7 +34,7 @@ To widen access, open a pull request with: the proposed grant, a concrete justif
 | update_entry | storage | YES | Implementer updates state after changes (course allow-list). |
 | delete_entry | storage | NO | Implementer must not remove project state (NM-3). |
 | audit_read | storage | NO | Audit inspection is owned by the orchestrator (NM-6). |
-| retrieve | retrieval | NO | Planning context comes from the Planner's handoff; denied by default. |
+| retrieve | retrieval | YES | Implementer retrieves reference docs, ceiling internal (course allow-list). |
 
 ### Tool and path access
 
@@ -314,7 +314,7 @@ To widen access, open a pull request with: the proposed grant, a concrete justif
 | write_entry | storage | YES | Orchestrator records run state it coordinates (course allow-list). |
 | update_entry | storage | YES | Orchestrator updates run state it coordinates (course allow-list). |
 | delete_entry | storage | YES | Orchestrator manages entry lifecycle; no other role may delete (closes NM-3). |
-| retrieve | retrieval | NO | Course table says YES at confidential; kept NO and internal because this orchestrator has no retrieval tool and no confidential data. |
+| retrieve | retrieval | YES | Orchestrator retrieves for coordination, ceiling confidential (course allow-list). |
 
 ### Tool and path access
 
@@ -336,8 +336,8 @@ To widen access, open a pull request with: the proposed grant, a concrete justif
 
 ### Data classification ceiling
 
-**Maximum level:** internal
-**Reason:** Orchestration needs no confidential data.
+**Maximum level:** confidential
+**Reason:** Course allow-list gives the orchestrator a confidential retrieval ceiling.
 
 ### Autonomy level
 
