@@ -9,4 +9,4 @@ Steps:
 
 ## Activation Scope
 
-Denied roles: implementer, orchestrator, planner, security-reviewer, tester, project-manager, test-coverage-analyzer
+Denied roles: implementer, orchestrator, planner, security-reviewer, tester, project-manager, test-coverage-analyzer, dependency-auditor

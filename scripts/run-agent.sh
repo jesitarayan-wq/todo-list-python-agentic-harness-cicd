@@ -16,7 +16,7 @@ case "$ROLE" in
     WORKSPACE_MODE="rw"
     MOUNT_MEMORY=1
     ;;
-  security-reviewer|planner|test-coverage-analyzer|tester|project-manager)
+  security-reviewer|planner|test-coverage-analyzer|tester|project-manager|dependency-auditor)
     WORKSPACE_MODE="ro"
     MOUNT_MEMORY=0
     ;;
