@@ -356,3 +356,51 @@ To widen access, open a pull request with: the proposed grant, a concrete justif
 **Conditions for human checkpoint:** Before replacing a human escalation with an automatic fallback; any attempt to do a subagent's work itself (agent file); any write outside the run record.
 **Reason:** The orchestrator coordinates but must not substitute for a subagent (NM-1, NM-6).
 **Container permissions:** workspace read-write, memory mounted
+
+## Role: dependency-auditor
+
+**Version:** v1.0.0
+**Defined in:** .claude/agents/dependency-auditor.md
+
+### MCP server and operation access
+
+| Operation | Server | Granted | Justification / Denial reason |
+|---|---|---|---|
+| retrieve | retrieval | YES | Auditor retrieves prior lessons such as the MCP version-pinning lesson, ceiling internal. |
+| write_entry | storage | NO | Auditor only reports; it must not change project state (NM-3). |
+| update_entry | storage | NO | Auditor only reports; it must not change project state (NM-3). |
+| delete_entry | storage | NO | Auditor must not remove project state (NM-3). |
+| read_entry | storage | NO | Not required; the dependency files are read from the workspace. Denied by least privilege. |
+| list_entries | storage | NO | Not required; denied by least privilege. |
+| audit_read | storage | NO | Audit inspection is owned by the orchestrator (NM-6). |
+
+### Tool and path access
+
+| Tool | Granted | Justification / Denial reason |
+|---|---|---|
+| file_read | YES | Reads requirements.txt and requirements.pip. |
+| codebase_search | YES | Finds where packages are imported. |
+| file_write | NO | Auditor must not edit dependency files; an auto-edited pin could break the servers (NM-3). |
+| shell | NO | Installing or upgrading packages is out of scope; denied by least privilege. |
+| test_runner | NO | Owned by the tester role. |
+| task_tracker | NO | Owned by the project-manager role. |
+| web_search | NO | Not required; denied by least privilege. |
+
+### Skill activation scope
+
+| Skill | Activation permitted | Reason if denied |
+|---|---|---|
+| check-gmail, send-email, send-slack-message, rebuild-and-deploy, summarize-session | NO | Not part of dependency auditing; denied by least privilege. rebuild-and-deploy in particular would let an auditor change the image. |
+
+### Data classification ceiling
+
+**Maximum level:** internal
+**Reason:** Dependency findings need no confidential data.
+
+### Autonomy level
+
+**Level:** low
+**Conditions for human checkpoint:** Output is advisory only. Any change to a dependency file is made by the implementer after a human approves. The role name must match across the agent file, grant map and server allow-lists (NM-1).
+**Reason:** A role that can change dependencies can quietly alter the very packages it is meant to inspect.
+
+**Container permissions:** workspace read-only, memory omitted
