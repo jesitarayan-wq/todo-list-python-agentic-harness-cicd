@@ -29,9 +29,9 @@ To widen access, open a pull request with: the proposed grant, a concrete justif
 | Operation | Server | Granted | Justification / Denial reason |
 |---|---|---|---|
 | write_entry | storage | YES | Implementer records one lesson learned per task (agent file). |
-| read_entry | storage | NO | Not required by the role; denied by default (agent file). |
-| list_entries | storage | NO | Not required by the role; denied by default (agent file). |
-| update_entry | storage | NO | Implementer must not rewrite stored state (NM-3). |
+| read_entry | storage | YES | Implementer reads prior decisions (course allow-list). |
+| list_entries | storage | YES | Implementer checks existing state (course allow-list). |
+| update_entry | storage | YES | Implementer updates state after changes (course allow-list). |
 | delete_entry | storage | NO | Implementer must not remove project state (NM-3). |
 | audit_read | storage | NO | Audit inspection is owned by the orchestrator (NM-6). |
 | retrieve | retrieval | NO | Planning context comes from the Planner's handoff; denied by default. |
@@ -128,8 +128,8 @@ To widen access, open a pull request with: the proposed grant, a concrete justif
 | write_entry | storage | NO | Reviewer must not change project state (NM-3). |
 | update_entry | storage | NO | Reviewer must not change project state (NM-3). |
 | delete_entry | storage | NO | Reviewer must not remove project state (NM-3). |
-| read_entry | storage | NO | Not required; denied by default. |
-| list_entries | storage | NO | Not required; denied by default. |
+| read_entry | storage | YES | Reviewer reads decisions to review them (course allow-list). |
+| list_entries | storage | YES | Reviewer checks what exists before reviewing (course allow-list). |
 | audit_read | storage | NO | Audit inspection is owned by the orchestrator (NM-6). |
 | does_not_exist | retrieval | NO | Not a real operation; declared in the agent file with no policy backing (NM-2). To be removed from the file. |
 
@@ -311,9 +311,9 @@ To widen access, open a pull request with: the proposed grant, a concrete justif
 | audit_read | storage | YES | Audit inspection is owned by the orchestrator (NM-6). Not yet enforced by the current servers. |
 | read_entry | storage | YES | Orchestrator reads state to coordinate subagents. |
 | list_entries | storage | YES | Orchestrator lists state to coordinate subagents. |
-| write_entry | storage | NO | Orchestrator must not change project state (NM-3). |
-| update_entry | storage | NO | Orchestrator must not change project state (NM-3). |
-| delete_entry | storage | NO | Must not remove project state (NM-3). |
+| write_entry | storage | YES | Orchestrator records run state it coordinates (course allow-list). |
+| update_entry | storage | YES | Orchestrator updates run state it coordinates (course allow-list). |
+| delete_entry | storage | YES | Orchestrator manages entry lifecycle; no other role may delete (closes NM-3). |
 | retrieve | retrieval | NO | Course table says YES at confidential; kept NO and internal because this orchestrator has no retrieval tool and no confidential data. |
 
 ### Tool and path access
