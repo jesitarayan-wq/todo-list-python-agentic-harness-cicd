@@ -2,11 +2,12 @@
 # run-agent.sh: launch a subagent container with only the permissions its
 # governance policy allows. Pass the role name as the first argument.
 set -euo pipefail
+export MSYS_NO_PATHCONV=1
 
 ROLE="${1:?Usage: run-agent.sh <role-name> [command]}"
 shift
 
-IMAGE="${AGENT_IMAGE:-agentic_engineer_4}"
+IMAGE="${AGENT_IMAGE:-todo-agent-m4}"
 WORKSPACE_MODE="ro"
 MOUNT_MEMORY=0
 
@@ -15,7 +16,7 @@ case "$ROLE" in
     WORKSPACE_MODE="rw"
     MOUNT_MEMORY=1
     ;;
-  reviewer|tester|project-manager)
+  security-reviewer|planner|test-coverage-analyzer|tester|project-manager)
     WORKSPACE_MODE="ro"
     MOUNT_MEMORY=0
     ;;
@@ -48,7 +49,7 @@ ARGS+=( -e "RETRIEVAL_AUDIT_LOG=/logs/retrieval-audit-log.jsonl" )
 
 # Mount persistent memory only for roles allowed by policy.
 if [ "$MOUNT_MEMORY" -eq 1 ]; then
-  ARGS+=( -v agent-memory:/memory )
+  ARGS+=( -v "$(pwd)/.memory:/memory:rw" )
 fi
 
 # Role identity.
