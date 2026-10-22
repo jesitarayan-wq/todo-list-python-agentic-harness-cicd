@@ -211,6 +211,7 @@ jobs:
             --policy-result "${{ needs.policy-gate.result }}" \
             --governed-result "${{ needs.governed-file-gate.result }}" \
             --review-result "${{ needs.advisory-review.result }}" \
+            --eval-result "${{ needs.eval-gate.result }}" \
             --artifacts ci-artifacts
 
       - name: Upload audit trail
