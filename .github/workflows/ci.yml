@@ -110,6 +110,37 @@ jobs:
           retention-days: 90
           if-no-files-found: ignore
 
+  eval-gate:
+    name: Evaluation Harness
+    runs-on: ubuntu-latest
+    needs: [change-type-check, policy-gate]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build course container
+        if: needs.change-type-check.outputs.requires-governed-check == 'true'
+        run: docker build -t agentic_engineer_4 .
+
+      - name: Run deterministic harness on saved holdout transcript
+        if: needs.change-type-check.outputs.requires-governed-check == 'true'
+        run: |
+          mkdir -p ci-artifacts
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE":/workspace:ro \
+            -v "$GITHUB_WORKSPACE/ci-artifacts":/reports \
+            -w /workspace \
+            agentic_engineer_4 \
+            sh -c "python eval/test_deterministic.py .eval-artifacts/runs/holdout-1/HO-01.json | tee /reports/deterministic-report.txt"
+
+      - name: Upload evaluation reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report
+          path: ci-artifacts/deterministic-report.txt
+          retention-days: 90
+          if-no-files-found: ignore
+
   advisory-review:
     name: Advisory Code Review
     runs-on: ubuntu-latest
@@ -150,7 +181,7 @@ jobs:
   audit-trail:
     name: Audit Trail
     runs-on: ubuntu-latest
-    needs: [change-type-check, policy-gate, governed-file-gate, advisory-review]
+    needs: [change-type-check, policy-gate, governed-file-gate, eval-gate, advisory-review]
     if: always()
     steps:
       - uses: actions/checkout@v4
