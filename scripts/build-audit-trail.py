@@ -36,6 +36,7 @@ def main() -> int:
     parser.add_argument("--policy-result", default="unknown")
     parser.add_argument("--governed-result", default="unknown")
     parser.add_argument("--review-result", default="unknown")
+    parser.add_argument("--eval-result", default="unknown")
     parser.add_argument("--artifacts", default="ci-artifacts")
     args = parser.parse_args()
 
@@ -62,12 +63,14 @@ def main() -> int:
             "policy_gate": args.policy_result,
             "governed_file_gate": args.governed_result,
             "advisory_review": args.review_result,
+            "evaluation_harness": args.eval_result,
         },
         "reports_present": {
             "policy_report": bool(policy_report),
             "governed_file_report": bool(governed_report),
             "review_audit": bool(review_audit),
             "review_output": bool(review_output),
+            "eval_report": (artifact_dir / "deterministic-report.txt").exists(),
         },
         "policy_report_summary": {
             "exitcode": policy_report.get("exitcode"),
