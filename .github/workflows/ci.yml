@@ -33,14 +33,14 @@ jobs:
           echo "changed-files=$CHANGED_ONELINE" >> "$GITHUB_OUTPUT"
 
           # Files that affect agent behavior, tool contracts, evals, or governance.
-          if echo "$CHANGED" | grep -qE '^(\.agents/|\.skills/|mcp-servers/|eval/|docs/governance-policy\.md|docs/routing-and-tool-grant-map\.md|scripts/run-agent\.sh)'; then
+          if echo "$CHANGED" | grep -qE '^(\.agents/|\.skills/|\.claude/agents/|skills/|mcp-servers/|eval/|docs/governance-policy\.md|docs/routing-and-tool-grant-map\.md|scripts/run-agent\.sh)'; then
             echo "requires-governed-check=true" >> "$GITHUB_OUTPUT"
           else
             echo "requires-governed-check=false" >> "$GITHUB_OUTPUT"
           fi
 
           # Policy/access-control-relevant files.
-          if echo "$CHANGED" | grep -qE '^(docs/governance-policy\.md|mcp-servers/.*/allow-list\.json|scripts/run-agent\.sh|\.skills/)'; then
+          if echo "$CHANGED" | grep -qE '^(docs/governance-policy\.md|mcp-servers/.*/allow-list\.json|scripts/run-agent\.sh|\.skills/|\.claude/agents/|skills/)'; then
             echo "touches-policy=true" >> "$GITHUB_OUTPUT"
           else
             echo "touches-policy=false" >> "$GITHUB_OUTPUT"
