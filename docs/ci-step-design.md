@@ -32,3 +32,15 @@ Rule: new agentic steps start advisory. A step can gate only if it gives clear, 
 - Produces: ci-audit-trail-<sha>.json artifact (confirmed in CI run #1).
 - Classification: observational; always runs.
 - Credentials: none.
+
+## Step: Pipeline integrity check
+- Does: Reads .github/workflows/ci.yml and fails if the pipeline has been weakened.
+- Checks: (1) policy-gate, eval-gate and pipeline-integrity exist and have no continue-on-error: true, because that would silently disable a gate. (2) audit-trail exists and keeps if: always(), so evidence is kept even when other jobs fail. (3) change-type-check exists, because later jobs depend on its outputs.
+- Input: the workflow file only (no Docker build, no secrets).
+- Produces: integrity-report.json artifact with fields check, result (passed or failed) and sha. The audit trail records it as results.pipeline_integrity and reports_present.integrity_report.
+- Classification: gating, permanent. It protects an invariant the team agreed must always hold, so it is never demoted to advisory.
+- Runs: needs change-type-check only, with if: always(), so a failing policy gate cannot hide a weakened pipeline.
+- Required status check: "Pipeline Integrity Check" added to the protect-main ruleset.
+- Audit trail wiring: pipeline-integrity is in audit-trail's needs list; build-audit-trail.py takes --integrity-result.
+- Time limit: 2 minutes. Credentials: none.
+- Verified: On a throwaway branch, continue-on-error: true was added to policy-gate. Pipeline Integrity Check failed with exit code 1 (the script's response to a weakened gate), and the branch was deleted without merging. Not recorded: the exact log line, and whether the merge button was blocked.
