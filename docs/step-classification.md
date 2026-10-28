@@ -1,28 +1,21 @@
 # Step Classification
 
-This document is updated after every calibration cycle. Steps that cross the stability threshold are promoted to candidate status. A step that has been a candidate for more than two calibration cycles without meeting all four signals is reviewed for re-scoping.
+Updated 2026-10-22 for todo-list-python. Evidence below is this project's own.
 
-## Step: JSON schema validation
-
-- Status: Converted to deterministic (ADR-001, 2026-06-06).
-- Stability: harness scores 14/16, 15/16, 14/16 across the last three calibration runs. Consistent.
-- Repeatability: three runs on the same holdout input produced identical output.
-- Specifiability: validate the output document against `schemas/handoff.json` and reject it if any required field is missing, null, or empty.
-- Run rate: every workflow invocation.
-- Preserved edge case: present-but-empty required fields are rejected by `scripts/validate_handoff_deterministic.py` and covered by `eval/test_deterministic_step.py`.
+## Step: Handoff field check
+- Status: converted to deterministic code (ADR-003).
+- Stability: not measured. Only one calibration cycle exists (docs/calibration-log.md, Cycle 1), so the two-cycle signal is not met. Converted anyway because the rule is fully specifiable.
+- Repeatability: the script gave identical output on three runs of the same input.
+- Specifiability: an implementer handoff must have task_id, role, summary and a non-empty modified_files list; each item needs a non-empty path and description.
+- Run rate: every implementer handoff.
+- Preserved edge case: present-but-empty values are rejected (covered by eval/test_deterministic_step.py).
 - Recommendation: converted.
 
-## Step: Planner
+## Step: Run-record writing
+- Recommendation: candidate. The agent self-report failed to be written in 3 of 7 holdout runs. Not yet converted.
 
-- Recommendation: not a candidate. Needs judgment and synthesis to break a task into subtasks; output is not specifiable in advance.
-- Next review: 2026-09-04.
+## Step: Planner, implementer, security-reviewer
+- Recommendation: keep as agents. They need judgment and synthesis; the correct output is not specifiable in advance.
 
-## Step: Release note draft
-
-- Recommendation: weak candidate. Output is prose that needs human review and is not yet repeatable across runs.
-- Candidate since: 2026-06-04. Next review: 2026-07-04.
-
-## Step: Path-based routing
-
-- Recommendation: converted to deterministic sample (ADR-002). It uses explicit path rules with a default for unmatched paths.
-- Preserved edge case: unmatched paths route to `implementer` instead of failing silently.
+## Step: Closing a ticket when the tester result is unverified
+- Recommendation: human. The tester's test_runner returns placeholder PASS output, so a person should confirm.

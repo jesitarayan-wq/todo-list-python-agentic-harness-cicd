@@ -33,6 +33,18 @@ def validate(document: Dict[str, Any], schema: Dict[str, Any]) -> List[str]:
             problems.append(f"required field is empty: {field}")
         elif isinstance(document[field], str) and document[field].strip() == "":
             problems.append(f"required field is empty: {field}")
+
+    for field, item_keys in schema.get("list_fields", {}).items():
+        value = document.get(field)
+        if value is None:
+            continue
+        if not isinstance(value, list) or len(value) == 0:
+            problems.append(f"{field} must be a non-empty list")
+            continue
+        for i, item in enumerate(value):
+            for key in item_keys:
+                if not isinstance(item, dict) or not str(item.get(key, "")).strip():
+                    problems.append(f"{field}[{i}] missing or empty: {key}")
     return problems
 
 
