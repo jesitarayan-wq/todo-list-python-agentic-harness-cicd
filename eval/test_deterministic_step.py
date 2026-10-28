@@ -49,3 +49,63 @@ def test_missing_required_field_is_rejected():
     document = {"task_id": "T-1006", "owner": "reviewer"}
     problems = validate(document, SCHEMA)
     assert "missing required field: summary" in problems
+
+
+# ---- Tests for this project's handoff schema (implementer handoff) ----
+import json
+
+PROJECT_SCHEMA = json.loads(
+    (Path(__file__).resolve().parent.parent / "schemas" / "handoff.json").read_text(encoding="utf-8")
+)
+
+
+def _handoff(**overrides):
+    doc = {
+        "task_id": "HO-02",
+        "role": "implementer",
+        "summary": "Add ObjectId validation to GET /tasks/<pk>",
+        "modified_files": [{"path": "todo.py", "description": "return 400 on invalid ObjectId"}],
+    }
+    doc.update(overrides)
+    return doc
+
+
+def test_project_handoff_ho02_valid():
+    assert validate(_handoff(), PROJECT_SCHEMA) == []
+
+
+def test_project_handoff_ho04_two_files_valid():
+    doc = _handoff(task_id="HO-04", modified_files=[
+        {"path": "task.py", "description": "implement TaskDAO.update"},
+        {"path": "todo.py", "description": "implement PUT route"}])
+    assert validate(doc, PROJECT_SCHEMA) == []
+
+
+def test_project_handoff_ho07_with_lesson_id_valid():
+    doc = _handoff(task_id="HO-07", lesson_entry_id="lesson-001")
+    assert validate(doc, PROJECT_SCHEMA) == []
+
+
+def test_project_empty_description_rejected():
+    doc = _handoff(modified_files=[{"path": "todo.py", "description": ""}])
+    assert "modified_files[0] missing or empty: description" in validate(doc, PROJECT_SCHEMA)
+
+
+def test_project_whitespace_description_rejected():
+    doc = _handoff(modified_files=[{"path": "todo.py", "description": "   "}])
+    assert "modified_files[0] missing or empty: description" in validate(doc, PROJECT_SCHEMA)
+
+
+def test_project_empty_file_list_rejected():
+    assert "modified_files must be a non-empty list" in validate(_handoff(modified_files=[]), PROJECT_SCHEMA)
+
+
+def test_project_missing_file_list_rejected():
+    doc = _handoff()
+    del doc["modified_files"]
+    assert "missing required field: modified_files" in validate(doc, PROJECT_SCHEMA)
+
+
+def test_project_missing_path_rejected():
+    doc = _handoff(modified_files=[{"description": "change"}])
+    assert "modified_files[0] missing or empty: path" in validate(doc, PROJECT_SCHEMA)
