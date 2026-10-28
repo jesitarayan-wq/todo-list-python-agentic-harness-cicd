@@ -1,34 +1,35 @@
 # Step Classification
 
-Updated 2026-10-22 for todo-list-python. Evidence is this project's own. Categories: strong candidate, weak candidate, not a candidate, already deterministic.
+This document is updated after every calibration cycle. Steps that cross the stability threshold are promoted to candidate status. A step that has been a candidate for more than two calibration cycles without meeting all four signals is reviewed for re-scoping.
+
+Updated 2026-10-29 for todo-list-python. Evidence is this project's own. Categories: strong candidate, weak candidate, not a candidate, already deterministic.
 
 ## Step: Handoff field check
-- Stability: not measured. Only one calibration cycle exists (docs/calibration-log.md, Cycle 1), and holdout scores varied.
-- Repeatability: the deterministic script gave identical output on three runs (0.193s, 0.170s, 0.175s). The agent version was never run three times.
-- Specifiability: an implementer handoff needs task_id, role, summary and a non-empty modified_files list; each item needs a non-empty path and description.
+- Status: converted to deterministic code (ADR-003, 2026-10-22). ADR-003 is Proposed, not Accepted: the full end-to-end run was not possible.
+- Stability: not measured. One calibration cycle exists (docs/calibration-log.md, Cycle 1).
+- Repeatability: script output identical on three runs (0.193s, 0.170s, 0.175s).
+- Specifiability: task_id, role, summary, and a non-empty modified_files list with a path and description per item.
 - Run rate: every implementer handoff.
-- Edge case the deterministic version must preserve: a description that is present but whitespace-only. It is rejected (tested in eval/test_deterministic_step.py).
-- Recommendation: weak candidate. Already converted as ADR-003. To qualify as a strong candidate: a second calibration cycle with consistent harness scores, and three repeat runs of the agent version compared with diff.
+- Preserved edge case: present-but-whitespace values are rejected (eval/test_deterministic_step.py).
+- Recommendation: weak candidate, converted. To qualify as strong: a second calibration cycle with consistent scores, and three repeat runs of an agent version.
+- Next review: 2026-11-26.
 
 ## Step: Run-record writing
 - Stability: not stable. The agent self-report was not written in 3 of 7 holdout runs.
-- Repeatability: not repeatable.
-- Specifiability: yes. The record format is fixed.
-- Run rate: every run.
-- Edge case: a session that exits before the record is written. Code must still produce a record from available facts.
-- Recommendation: weak candidate. Needs a hook or script that writes the record, and a measured baseline.
+- Specifiability: yes. Fixed record format.
+- Edge case: a session that exits before the record is written.
+- Recommendation: weak candidate. Needs a hook or script and a measured baseline.
+- Candidate since: 2026-10-20. Next review: 2026-11-19.
 
 ## Step: Planner, implementer, security-reviewer
-- Stability, repeatability: not measured.
-- Specifiability: no. The correct output is not known in advance.
-- Run rate: per task.
-- Edge case: none identified, because these are kept as agents.
-- Recommendation: not a candidate. They need judgment and synthesis.
+- Recommendation: not a candidate. Needs judgment and synthesis; output not specifiable in advance.
+- Edge case: none identified.
+- Next review: 2027-01-29.
 
 ## Step: Classification, role and ceiling checks in the MCP servers
-- Recommendation: already deterministic. Allow-list lookups in mcp-servers/*/server.py.
+- Recommendation: already deterministic (allow-list lookups in mcp-servers/*/server.py).
 - Edge case: none identified.
 
 ## Step: Closing a ticket when the tester result is unverified
-- Recommendation: not a candidate. A human should confirm, because test_runner returns placeholder PASS output.
-- Edge case: none identified.
+- Recommendation: not a candidate. A human confirms, because test_runner returns placeholder PASS output.
+- Next review: 2027-01-29.
