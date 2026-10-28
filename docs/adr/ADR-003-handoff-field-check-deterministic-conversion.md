@@ -1,7 +1,7 @@
 # ADR-003: Convert the handoff field check from agent convention to deterministic code
 
 ## Status
-Accepted
+Proposed
 
 ## Context
 Agent handoffs (implementer to orchestrator) were a convention in the agent prompts: a list of modified files, a description of each change, and any lesson entry_id. Nothing checked them. HO-04 probed this "output format mismatch" risk, and its referenced handoff spec file never existed. The rule can be written exactly.
@@ -21,3 +21,6 @@ Measured: the script took 0.193s, 0.170s and 0.175s over three runs on the same 
 - docs/step-classification.md
 - examples/handoff_good.json (valid, exit 0) and examples/handoff_bad.json (empty description, exit 1)
 - eval/test_deterministic_step.py: 7 passed
+
+## Process note
+The validator and sample handoffs were written before this ADR, and the ADR was committed together with the code (89a35bc). That reverses the intended order (ADR first, as Proposed). Status is Proposed because acceptance requires the script to be wired into a running workflow, an end-to-end regression check, and a calibration log entry. None of these exist yet.
