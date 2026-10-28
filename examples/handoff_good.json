@@ -1,0 +1,3 @@
+{"task_id": "HO-02", "role": "implementer", "summary": "Add ObjectId validation to GET /tasks/<pk>",
+ "modified_files": [{"path": "todo.py", "description": "return 400 when pk is not a valid ObjectId"}],
+ "lesson_entry_id": "lesson-001"}
