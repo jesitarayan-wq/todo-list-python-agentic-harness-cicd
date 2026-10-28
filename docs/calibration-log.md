@@ -140,3 +140,10 @@ Not measurable. The handoff format was a convention in the agent prompts (implem
 
 ### Regression check
 No agent baseline exists, so no like-for-like comparison is possible. No test fails against the script.
+
+## End-to-end regression check after handoff-check conversion (2026-10-29)
+- Policy suite and handoff unit tests: 50 passed (35 in eval/test_policy.py, 15 in eval/test_deterministic_step.py).
+- Harness replay: eval/test_deterministic.py on .eval-artifacts/runs/holdout-1/HO-01.json, 11/11 deterministic checks passed.
+- Seam check: examples/handoff_good.json through scripts/validate_handoff_deterministic.py, exit 0.
+- Not run: the full orchestration on 2 holdout and 2 development tasks. The orchestrator has no shell tool, and eval/orchestrator.py is the course's simulated orchestrator, so it would not exercise the real workflow.
+- Result: no regression found in what could be run. ADR-003 remains Proposed because the end-to-end condition for acceptance was not met.
