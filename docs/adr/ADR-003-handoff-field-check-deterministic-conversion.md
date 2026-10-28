@@ -11,7 +11,7 @@ Check each handoff with scripts/validate_handoff_deterministic.py against schema
 
 ## Alternatives considered
 - Keep it as an agent convention. Rejected: no check, variance, and governance overhead for a fixed rule.
-- Ask an agent to validate. Not measured here, so no figures are claimed. Qualitatively it adds token cost and inference latency to a step with no ambiguity.
+- Ask an agent to validate. Not measured (no agent version of this step exists). Qualitatively it adds token cost, latency and variance to a rule with no ambiguity.
 - Convert to code. Accepted.
 
 ## Consequences
@@ -24,3 +24,6 @@ Measured: the script took 0.193s, 0.170s and 0.175s over three runs on the same 
 
 ## Process note
 The validator and sample handoffs were written before this ADR, and the ADR was committed together with the code (89a35bc). That reverses the intended order (ADR first, as Proposed). Status is Proposed because acceptance requires the script to be wired into a running workflow, an end-to-end regression check, and a calibration log entry. None of these exist yet.
+
+## Evidence update (2026-10-22)
+See docs/calibration-log.md, "Handoff field check: conversion measurements". After-conversion: about 0.18s, zero token cost, identical output on three runs, 15 tests passing. Before-conversion: not measurable. Status remains Proposed until the script is wired into a workflow and an end-to-end check passes.

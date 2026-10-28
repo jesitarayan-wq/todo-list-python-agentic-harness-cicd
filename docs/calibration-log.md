@@ -124,3 +124,19 @@ Derived from Cycle 1 and Holdout measurement 1 above. Each pattern states the ev
 
 ### Observed outside the log
 - Credential files slack_token.txt and google_cred.json sit in the old repo root, untracked by git. Risk: secrets near paths an agent can read. Boundary needed: a path deny-list for agent file reads, and .gitignore rules (added in the port).
+
+## Handoff field check: conversion measurements (2026-10-22)
+
+### Before-conversion entry
+Not measurable. The handoff format was a convention in the agent prompts (implementer and planner "Output format"), never a separate agentic step, so there is no agent run, token cost, or harness score to record. No figures are claimed.
+
+### After-conversion entry (scripts/validate_handoff_deterministic.py)
+- Latency: 0.193s, 0.170s, 0.175s over three runs (average about 0.18s).
+- Cost: zero tokens.
+- Predictability: result files from the three runs were identical (diff reported no differences).
+- Quality: eval/test_deterministic_step.py, 15 passed (7 from the course sample, 8 for this project's schema).
+- Rubric dimensions: not applicable, the output is structured JSON, not prose.
+- Review latency and audit clarity: not measured with a second person; the script is about 60 lines.
+
+### Regression check
+No agent baseline exists, so no like-for-like comparison is possible. No test fails against the script.
