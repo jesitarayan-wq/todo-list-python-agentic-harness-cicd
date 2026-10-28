@@ -19,3 +19,6 @@
 
 - Giving the Security Reviewer the test-runner so it could verify its own findings. Ruled out: the Tester role owns test execution. A Reviewer that can also run tests blurs the role boundary and creates ambiguous ownership when a test fails, since two roles could each claim or disclaim responsibility.
 - Giving the Implementer the task-tracker so it could update ticket status as it works. Ruled out: task tracking belongs to the Project Manager. Granting it here would put the ticket tool's description into the Implementer's context for no benefit and would let the Implementer move tickets on its own, outside its actual job.
+
+## Converted steps
+- handoff-validation: converted to deterministic code (ADR-003). No MCP access required.

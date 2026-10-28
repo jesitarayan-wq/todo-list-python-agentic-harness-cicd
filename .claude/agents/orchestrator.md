@@ -42,6 +42,7 @@ run is accepted only when:
 ### Standard sequence
 1. planner           receives: feature request + repo path
 2. implementer       receives: plan + file list
+2a. handoff check     the implementer result is saved as a handoff JSON and checked with scripts/validate_handoff_deterministic.py (ADR-003). If "valid" is false, re-invoke the implementer with the problems list.
 3. security-reviewer receives: implementer's changed files
 4. tester            receives: implementer's changed files (post-review)
 5. project-manager   receives: final run outcome (accepted/escalated)

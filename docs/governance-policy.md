@@ -404,3 +404,6 @@ To widen access, open a pull request with: the proposed grant, a concrete justif
 **Reason:** A role that can change dependencies can quietly alter the very packages it is meant to inspect.
 
 **Container permissions:** workspace read-only, memory omitted
+
+## Deterministic conversion history
+- handoff-validation: converted from an agent convention to deterministic code, see docs/adr/ADR-003-handoff-field-check-deterministic-conversion.md. No role, allow-list grant or credential was held by this step, so none was removed.
