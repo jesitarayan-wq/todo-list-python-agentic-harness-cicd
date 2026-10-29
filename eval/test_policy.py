@@ -105,7 +105,7 @@ def test_retrieval_allowlist_matches_policy(role):
     assert granted == want, f"{role}: allow-list granted={granted}, policy={want}"
 
 
-@pytest.mark.parametrize("skill_file", sorted((_R / "skills").glob("*/SKILL.md")))
+@pytest.mark.parametrize("skill_file", sorted(list((_R / "skills").glob("*/SKILL.md")) + list((_R / ".claude" / "skills").glob("*/SKILL.md"))))
 def test_skill_scope_matches_policy(skill_file):
     skill = skill_file.parent.name
     text = skill_file.read_text(encoding="utf-8")

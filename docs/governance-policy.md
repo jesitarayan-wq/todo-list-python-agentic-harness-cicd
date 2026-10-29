@@ -52,6 +52,7 @@ To widen access, open a pull request with: the proposed grant, a concrete justif
 
 | Skill | Activation permitted | Reason if denied |
 |---|---|---|
+| write-handoff | YES | Implementer writes its handoff JSON and validates it with the deterministic validator (ADR-003). |
 | check-gmail | NO | Not part of implementation; denied by default. |
 | send-email | NO | Not part of implementation; denied by default. |
 | send-slack-message | NO | Not part of implementation; denied by default. |
@@ -343,6 +344,7 @@ To widen access, open a pull request with: the proposed grant, a concrete justif
 
 | Skill | Activation permitted | Reason if denied |
 |---|---|---|
+| run-policy-check | YES | Orchestrator runs the policy test suite after governance changes. |
 | check-gmail, send-email, send-slack-message, rebuild-and-deploy, summarize-session | NO | Not part of orchestration; denied by default. |
 
 ### Data classification ceiling

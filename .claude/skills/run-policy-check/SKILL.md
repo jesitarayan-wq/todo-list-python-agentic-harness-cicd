@@ -12,4 +12,5 @@ version: 0.1.0
 4. Do not edit the policy and the artifact together to hide a mismatch. Report which side looks authoritative and ask a human.
 
 ## Activation Scope
-Permitted roles: orchestrator. Denied roles: all others.
+Permitted roles: orchestrator
+Denied roles: implementer, planner, security-reviewer, tester, project-manager, test-coverage-analyzer, dependency-auditor

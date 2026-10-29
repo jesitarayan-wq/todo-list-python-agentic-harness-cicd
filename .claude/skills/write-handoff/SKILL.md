@@ -13,4 +13,5 @@ version: 0.1.0
 5. Report the validation result. Do not invent files or descriptions.
 
 ## Activation Scope
-Permitted roles: implementer. Denied roles: all others.
+Permitted roles: implementer
+Denied roles: orchestrator, planner, security-reviewer, tester, project-manager, test-coverage-analyzer, dependency-auditor
