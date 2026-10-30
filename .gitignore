@@ -235,3 +235,4 @@ slack_channel_info.txt
 mcp-cleanup.log
 Dockerfile.save
 logs/storage-store.json
+credentials.json
