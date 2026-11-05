@@ -27,3 +27,8 @@ The validator and sample handoffs were written before this ADR, and the ADR was 
 
 ## Evidence update (2026-10-22)
 See docs/calibration-log.md, "Handoff field check: conversion measurements". After-conversion: about 0.18s, zero token cost, identical output on three runs, 15 tests passing. Before-conversion: not measurable. Status remains Proposed until the script is wired into a workflow and an end-to-end check passes.
+
+## Open risks
+- Stability was not measured: there was one calibration cycle.
+- No agent baseline exists, so there is no before-and-after claim. To close it, have an agent perform the check on three runs and compare latency, tokens and variation.
+- The check is wired as an orchestrator step, but the orchestrator has no shell tool to run it, so no end-to-end check has passed.
