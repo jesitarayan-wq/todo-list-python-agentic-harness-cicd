@@ -11,7 +11,7 @@ AI helpers can make quiet mistakes that nobody notices until they cost real time
 A team of eight AI roles that work on a small to-do application, with safety checks built into how they work, not left to good intentions.
 
 - **Each role gets only the access its job needs.** The reviewer can read code but cannot change it; only the ticket role can update tickets.
-- **Every change is checked automatically.** 52 checks pass today, and a change cannot reach the main code unless three required checks pass.
+- **Every change is checked automatically.** 59 checks pass today, and a change cannot reach the main code unless three required checks pass.
 - **A record is kept.** Refused actions are logged, so a manager can see what was tried and what was blocked.
 
 ## What it could save (a projection)
@@ -34,7 +34,7 @@ These figures come from assumptions, not measurements. Replace the assumptions w
 
 ## Proof it works
 
-52 automated checks pass, and each safety layer has a recorded case of blocking something:
+59 automated checks pass, and each safety layer has a recorded case of blocking something:
 
 - The reviewer tried to create a file and the system refused it, because its workspace is read-only.
 - A deliberately wrong permission change turned the checks red.
