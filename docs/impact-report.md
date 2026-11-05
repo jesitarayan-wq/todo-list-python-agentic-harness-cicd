@@ -8,13 +8,13 @@ Failures that used to pass silently are now caught by tests and CI, and one live
 
 - **Measured:** 52 automated checks pass; retrieval went from 5/7 to 7/7 after a fix; a revoked permission was caught by exactly one failing policy test (36 passed, then 37 after the fix); the handoff check as code runs in about 0.18 s with zero tokens.
 - **Two improvement cycles, each confirmed by a rerun:** the reviewer authorization fix, and the retrieval fix (details below).
-- **Not measured:** full-pipeline cost, cycle time, review latency and defect rate. The table below marks each one as measured, a proxy, or not yet measured.
+- **Not measured:** review latency and defect rate; full-pipeline cost and cycle time are only partly measured (one governed run). The table below marks each one as measured, a proxy, or not yet measured.
 
 Scope: delivery path is no-deployment on a representative to-do API. The Module 1 baseline measured a different task (unit tests for `module_x.py`), so comparisons are by metric type, not like for like.
 
 ## Baseline versus after
 
-Of the five measures, quality is measured, defect rate and cost have proxies, and review latency and full-pipeline cycle time are not measured.
+Of the five measures, quality is measured, defect rate and cost have proxies, review latency is not measured, and full-pipeline cycle time is partly measured (one governed run).
 
 | Measure | Baseline (Module 1, different task) | After | Status |
 | --- | --- | --- | --- |
