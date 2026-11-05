@@ -1,0 +1,15 @@
+{
+  "task_id": "LIVE-01",
+  "role": "implementer",
+  "summary": "Implemented TaskDAO.update(object_id, data) in task.py. It whitelists title, description, priority and done via UPDATABLE_FIELDS, so unknown keys and _id are ignored. It raises ValueError for a non-boolean done before any database call, a deliberate human-approved deviation from the route-layer validation standard. With no updatable fields it returns read(object_id). Otherwise it applies $set via find_one_and_update with ReturnDocument.AFTER and returns the result through to_json, which gives None for an unknown id. Priority is not validated, per the human decision. Added 15 test_update_* tests to tests/test_task.py in the existing mongomock style, including the malformed-id InvalidId test. todo.py was not changed.",
+  "modified_files": [
+    {
+      "path": "task.py",
+      "description": "Added ReturnDocument import, UPDATABLE_FIELDS constant, and the real update(self, object_id, data) replacing the stub."
+    },
+    {
+      "path": "tests/test_task.py",
+      "description": "Added InvalidId import, a _create_task helper, and 15 test_update_* tests covering field updates, unknown keys/_id, empty data, unknown id, non-boolean done, and malformed id."
+    }
+  ]
+}

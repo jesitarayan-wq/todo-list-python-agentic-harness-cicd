@@ -1,0 +1,220 @@
+diff --git a/.memory/project/MEMORY_INDEX.md b/.memory/project/MEMORY_INDEX.md
+index 499c603..f0bd98e 100644
+--- a/.memory/project/MEMORY_INDEX.md
++++ b/.memory/project/MEMORY_INDEX.md
+@@ -1,6 +1,6 @@
+ # Project Memory Index
+ 
+-Last updated: 2026-10-01 (decision-003 reconfirmed, review date extended)
++Last updated: 2026-11-05 (decision-006 added; decision-004 updated for TaskDAO.update())
+ 
+ ## Active entries
+ 
+@@ -29,6 +29,9 @@ Last updated: 2026-10-01 (decision-003 reconfirmed, review date extended)
+ - `decisions/decision-005.md` — Records the decision to connect to the data API using a service account, with the key referenced only via the ANTHROPIC_API_KEY environment variable (never hardcoded in memory, knowledge, or code). Recorded 2026-10-01.
+  Review by 2026-12-30.
+ 
++- `decisions/decision-006.md` — Records acceptance of run LIVE-01 (TaskDAO.update() implemented and tested) and the follow-up that route authentication must be added before any PUT /tasks/<pk> route, plus required PUT route-layer validation. Recorded 2026-11-05.
++ Review by 2027-02-03.
++
+ ## Archived entries
+ 
+ (none yet)
+diff --git a/.memory/project/decisions/decision-004.md b/.memory/project/decisions/decision-004.md
+index 0e251d6..7305e4a 100644
+--- a/.memory/project/decisions/decision-004.md
++++ b/.memory/project/decisions/decision-004.md
+@@ -12,6 +12,6 @@
+ 
+ **Deferred (intentionally out of scope):**
+ - Backfilling `priority` onto existing documents created before this field existed.
+-- Implementing `TaskDAO.update()` and the `PUT /tasks/<pk>` route (both currently `pass`/unimplemented), which would allow changing priority after creation.
++- Implementing `TaskDAO.update()` and the `PUT /tasks/<pk>` route (both currently `pass`/unimplemented), which would allow changing priority after creation. **Update 2026-11-05:** `TaskDAO.update()` is now implemented (run LIVE-01, see [[decision-006]]); the `PUT /tasks/<pk>` route is still unimplemented and requires route auth first.
+ 
+ Note: [[decision-001]] itself only records the integer-vs-string storage rationale and does not explicitly discuss backfilling or `update()`/PUT -- these two items are deferred by omission (they were never implemented, and `TaskDAO.update()`/`PUT /tasks/<pk>` remain `pass`/no-op stubs in the current code), not by an explicit statement in decision-001. Neither is required for priority to function on creation, listing, and validation.
+diff --git a/task.py b/task.py
+index ea14581..0672a1a 100644
+--- a/task.py
++++ b/task.py
+@@ -3,9 +3,11 @@ import pymongo
+ import json
+ from bson import json_util
+ from bson.objectid import ObjectId
++from pymongo import ReturnDocument
+ 
+ PRIORITIES = (1, 2, 3)
+ DEFAULT_PRIORITY = 2
++UPDATABLE_FIELDS = ('title', 'description', 'priority', 'done')
+ 
+ 
+ class TaskDAO:
+@@ -38,8 +40,21 @@ class TaskDAO:
+         task = self.task_collection.find_one({ '_id': ObjectId(object_id)})
+         return self.to_json(task)
+ 
+-    def update(self):
+-        pass
++    def update(self, object_id, data):
++        changes = {k: data[k] for k in UPDATABLE_FIELDS if k in data}
++
++        if 'done' in changes and not isinstance(changes['done'], bool):
++            raise ValueError('done must be a boolean')
++
++        if not changes:
++            return self.read(object_id)
++
++        task = self.task_collection.find_one_and_update(
++            { '_id': ObjectId(object_id) },
++            { '$set': changes },
++            return_document=ReturnDocument.AFTER
++        )
++        return self.to_json(task)
+ 
+     def delete(self):
+         pass
+diff --git a/tests/test_task.py b/tests/test_task.py
+index 82a78da..d7071ea 100644
+--- a/tests/test_task.py
++++ b/tests/test_task.py
+@@ -1,6 +1,7 @@
+ # coding=utf-8
+ import mongomock
+ import pytest
++from bson.errors import InvalidId
+ 
+ from task import TaskDAO
+ 
+@@ -117,3 +118,133 @@ def test_list_sorts_by_done_before_priority(dao):
+     tasks = dao.list()
+ 
+     assert [task['title'] for task in tasks] == ['Undone Low Task', 'Done High Task']
++
++
++def _create_task(dao):
++    return dao.create({'title': 'Old Title', 'description': 'Old Description', 'priority': 3})
++
++
++def test_update_changes_the_title(dao):
++    created = _create_task(dao)
++
++    task = dao.update(created['_id']['$oid'], {'title': 'New Title'})
++
++    assert task['title'] == 'New Title'
++
++
++def test_update_changes_the_description(dao):
++    created = _create_task(dao)
++
++    task = dao.update(created['_id']['$oid'], {'description': 'New Description'})
++
++    assert task['description'] == 'New Description'
++
++
++def test_update_changes_the_priority(dao):
++    created = _create_task(dao)
++
++    task = dao.update(created['_id']['$oid'], {'priority': 1})
++
++    assert task['priority'] == 1
++
++
++def test_update_marks_task_done(dao):
++    created = _create_task(dao)
++
++    task = dao.update(created['_id']['$oid'], {'done': True})
++
++    assert task['done'] is True
++
++
++def test_update_can_mark_task_not_done_again(dao):
++    created = _create_task(dao)
++    dao.update(created['_id']['$oid'], {'done': True})
++
++    task = dao.update(created['_id']['$oid'], {'done': False})
++
++    assert task['done'] is False
++
++
++def test_update_only_changes_the_given_fields(dao):
++    created = _create_task(dao)
++
++    task = dao.update(created['_id']['$oid'], {'title': 'New Title'})
++
++    assert task['description'] == 'Old Description'
++    assert task['priority'] == 3
++    assert task['done'] is False
++
++
++def test_update_returns_the_updated_task_with_same_id(dao):
++    created = _create_task(dao)
++
++    task = dao.update(created['_id']['$oid'], {'title': 'New Title'})
++
++    assert task['_id'] == created['_id']
++
++
++def test_update_persists_the_change(dao):
++    created = _create_task(dao)
++
++    dao.update(created['_id']['$oid'], {'title': 'New Title', 'done': True})
++
++    stored = dao.read(created['_id']['$oid'])
++    assert stored['title'] == 'New Title'
++    assert stored['done'] is True
++
++
++def test_update_ignores_unknown_keys(dao):
++    created = _create_task(dao)
++
++    task = dao.update(created['_id']['$oid'], {'foo': 'bar', 'title': 'New Title'})
++
++    assert 'foo' not in task
++    stored = dao.task_collection.find_one({'title': 'New Title'})
++    assert 'foo' not in stored
++
++
++def test_update_does_not_overwrite_the_id(dao):
++    created = _create_task(dao)
++
++    task = dao.update(created['_id']['$oid'], {'_id': 'x', 'title': 'New'})
++
++    assert task['_id'] == created['_id']
++    assert task['title'] == 'New'
++    assert dao.task_collection.count_documents({}) == 1
++
++
++def test_update_with_empty_data_returns_task_unchanged(dao):
++    created = _create_task(dao)
++
++    task = dao.update(created['_id']['$oid'], {})
++
++    assert task == dao.read(created['_id']['$oid'])
++
++
++def test_update_returns_none_for_unknown_id(dao):
++    task = dao.update('5f9f1b9b9b9b9b9b9b9b9b9b', {'title': 'New Title'})
++
++    assert task is None
++    assert dao.task_collection.count_documents({}) == 0
++
++
++@pytest.mark.parametrize('bad_done', [1, 0, 'true', None])
++def test_update_rejects_non_boolean_done(dao, bad_done):
++    created = _create_task(dao)
++
++    with pytest.raises(ValueError):
++        dao.update(created['_id']['$oid'], {'done': bad_done})
++
++
++def test_update_does_not_apply_other_changes_when_done_is_invalid(dao):
++    created = _create_task(dao)
++
++    with pytest.raises(ValueError):
++        dao.update(created['_id']['$oid'], {'title': 'New', 'done': 'yes'})
++
++    assert dao.read(created['_id']['$oid'])['title'] == 'Old Title'
++
++
++def test_update_raises_for_invalid_object_id(dao):
++    with pytest.raises(InvalidId):
++        dao.update('abc', {'title': 'x'})
