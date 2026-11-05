@@ -12,6 +12,8 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -118,9 +120,32 @@ def shell(role: str, command: str) -> str:
 
 @mcp.tool()
 def test_runner(role: str, suite: str = "default") -> str:
-    """Return a realistic dummy test result for the requested suite."""
+    """Run the app's mock-based tests and return pytest's real output."""
     authorize("test_runner", role)
-    return f"PASS: dummy test suite '{suite}' completed successfully."
+    timeout_seconds = 120
+    if suite != "default":
+        raise ValueError(f"Unknown suite '{suite}'. Only 'default' is supported.")
+    try:
+        result = subprocess.run(
+            [sys.executable, "-m", "pytest", "tests/test_task.py", "-q", "-p", "no:cacheprovider"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            timeout=timeout_seconds,
+            env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+        )
+    except subprocess.TimeoutExpired:
+        return f"NOT RUN: pytest did not finish within {timeout_seconds} seconds."
+    except OSError as exc:
+        return f"NOT RUN: could not start pytest ({exc})."
+    tail = "\n".join((result.stdout + result.stderr).strip().splitlines()[-8:])
+    if result.returncode == 0:
+        status = "PASS"
+    elif result.returncode == 1:
+        status = "FAIL"
+    else:
+        status = "NOT RUN"
+    return f"{status} (pytest exit code {result.returncode}):\n{tail}"
 
 
 @mcp.tool()
