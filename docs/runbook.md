@@ -7,8 +7,8 @@
 - Rule: run git commit and git push on the host shell (Git Bash), never inside a container; the container has no saved GitHub login.
 
 ## Health check
-In a container: cd /workspace && python3 -m pytest eval/test_policy.py eval/test_deterministic_step.py -q
-Expected: 52 passed (37 policy + 15 handoff-validator tests).
+In a container: cd /workspace && python3 -m pytest eval/test_policy.py eval/test_deterministic_step.py eval/test_runner_tool.py -q
+Expected: 59 passed (37 policy + 15 handoff-validator + 7 test-runner tool tests; the image must include mongomock).
 
 ## Incident handling (details: docs/failure-mode-playbook.md)
 - A role is blocked or ungoverned: compare role names across the agent file, grant map and allow-lists (NM-1); run eval/test_policy.py.
@@ -31,4 +31,4 @@ Expected: 52 passed (37 policy + 15 handoff-validator tests).
 See docs/reliability-and-cost-controls.md (implemented versus planned).
 
 ## Known limits
-No live end-to-end run and no API key, so the AI review and rubric have never run. Skill scope is not a runtime lock. The tester's test_runner returns placeholder PASS output.
+One live run exists (docs/live-run-record.md) but no API key was registered, so the AI review and rubric have never run. Skill scope is not a runtime lock. The tester's test_runner now runs the mock-based tests of the app and returns the real pytest output.

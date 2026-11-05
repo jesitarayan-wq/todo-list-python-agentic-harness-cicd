@@ -1,0 +1,130 @@
+diff --git a/task.py b/task.py
+index ea14581..f7a3533 100644
+--- a/task.py
++++ b/task.py
+@@ -6,6 +6,7 @@ from bson.objectid import ObjectId
+ 
+ PRIORITIES = (1, 2, 3)
+ DEFAULT_PRIORITY = 2
++UPDATABLE_FIELDS = ('title', 'description', 'priority', 'done')
+ 
+ 
+ class TaskDAO:
+@@ -38,8 +39,16 @@ class TaskDAO:
+         task = self.task_collection.find_one({ '_id': ObjectId(object_id)})
+         return self.to_json(task)
+ 
+-    def update(self):
+-        pass
++    def update(self, object_id, data):
++        changes = {field: data[field] for field in UPDATABLE_FIELDS if field in data}
++
++        if 'done' in changes and not isinstance(changes['done'], bool):
++            raise ValueError("The field 'done' must be a boolean")
++
++        if changes:
++            self.task_collection.update_one({ '_id': ObjectId(object_id) }, { '$set': changes })
++
++        return self.read(object_id)
+ 
+     def delete(self):
+         pass
+diff --git a/tests/test_task.py b/tests/test_task.py
+index 82a78da..2ea532e 100644
+--- a/tests/test_task.py
++++ b/tests/test_task.py
+@@ -117,3 +117,94 @@ def test_list_sorts_by_done_before_priority(dao):
+     tasks = dao.list()
+ 
+     assert [task['title'] for task in tasks] == ['Undone Low Task', 'Done High Task']
++
++
++def test_update_changes_only_the_given_fields(dao):
++    created = dao.create({'title': 'Old Title', 'description': 'Old Description', 'priority': 3})
++
++    task = dao.update(created['_id']['$oid'], {'title': 'New Title'})
++
++    assert task['title'] == 'New Title'
++    assert task['description'] == 'Old Description'
++    assert task['priority'] == 3
++    assert task['done'] is False
++
++
++def test_update_changes_all_updatable_fields(dao):
++    created = dao.create({'title': 'Old Title', 'description': 'Old Description'})
++
++    task = dao.update(created['_id']['$oid'], {
++        'title': 'New Title',
++        'description': 'New Description',
++        'priority': 1,
++        'done': True
++    })
++
++    assert task['title'] == 'New Title'
++    assert task['description'] == 'New Description'
++    assert task['priority'] == 1
++    assert task['done'] is True
++
++
++def test_update_returns_task_as_json_with_same_id(dao):
++    created = dao.create({'title': 'The Best Title', 'description': 'The Best Description'})
++
++    task = dao.update(created['_id']['$oid'], {'done': True})
++
++    assert task['_id'] == created['_id']
++
++
++def test_update_persists_changes_in_collection(dao):
++    created = dao.create({'title': 'Old Title', 'description': 'Old Description'})
++
++    dao.update(created['_id']['$oid'], {'title': 'New Title'})
++
++    assert dao.read(created['_id']['$oid'])['title'] == 'New Title'
++
++
++def test_update_ignores_fields_that_are_not_updatable(dao):
++    created = dao.create({'title': 'The Best Title', 'description': 'The Best Description'})
++
++    task = dao.update(created['_id']['$oid'], {'owner': 'someone', 'title': 'New Title'})
++
++    assert task['title'] == 'New Title'
++    assert 'owner' not in task
++
++
++def test_update_with_no_updatable_fields_returns_unchanged_task(dao):
++    created = dao.create({'title': 'The Best Title', 'description': 'The Best Description'})
++
++    task = dao.update(created['_id']['$oid'], {})
++
++    assert task == created
++
++
++@pytest.mark.parametrize('done', ['true', 1, 0, None])
++def test_update_rejects_non_boolean_done(dao, done):
++    created = dao.create({'title': 'The Best Title', 'description': 'The Best Description'})
++
++    with pytest.raises(ValueError):
++        dao.update(created['_id']['$oid'], {'done': done})
++
++    assert dao.read(created['_id']['$oid'])['done'] is False
++
++
++def test_update_rejecting_done_does_not_apply_other_fields(dao):
++    created = dao.create({'title': 'Old Title', 'description': 'Old Description'})
++
++    with pytest.raises(ValueError):
++        dao.update(created['_id']['$oid'], {'title': 'New Title', 'done': 'yes'})
++
++    assert dao.read(created['_id']['$oid'])['title'] == 'Old Title'
++
++
++def test_update_returns_none_for_unknown_id(dao):
++    task = dao.update('5f9f1b9b9b9b9b9b9b9b9b9b', {'title': 'New Title'})
++
++    assert task is None
++
++
++def test_update_does_not_create_task_for_unknown_id(dao):
++    dao.update('5f9f1b9b9b9b9b9b9b9b9b9b', {'title': 'New Title'})
++
++    assert dao.task_collection.count_documents({}) == 0

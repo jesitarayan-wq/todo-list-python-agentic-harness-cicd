@@ -54,3 +54,6 @@ pytest
 # --- todo-list-python app and harness (ported) ---
 pymongo
 sqlite-vec
+
+# mongomock: lets the app mock-based tests run in the image (used by the test_runner tool)
+mongomock==4.3.0

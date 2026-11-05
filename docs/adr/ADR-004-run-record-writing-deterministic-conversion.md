@@ -19,3 +19,8 @@ Expected: records are always written, and are repeatable and cheap. Trade-off: a
 
 ## Evidence
 To gather: a second calibration cycle, three repeat runs, and the measurements in step-classification.md. Existing: the 3 of 7 failures in docs/calibration-log.md (Holdout measurement 1).
+
+## Open risks
+- The facts may not be capturable outside the agent.
+- Records may be thinner than agent-written ones.
+- Nothing is measured, so the status stays Proposed.
