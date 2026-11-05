@@ -14,7 +14,7 @@ Own skills (`.claude/skills/`, v0.1.0): `write-handoff`, `run-policy-check`.
 ## Run it
 1. Build the image (first build takes about 5 to 15 minutes): `docker build -t todo-agent-m4 .`
 2. Start a role container: `./scripts/run-agent.sh orchestrator bash`
-3. Inside the container run: `cd /workspace && python3 -m pytest eval/test_policy.py eval/test_deterministic_step.py -q` (expected: 52 passed, 37 policy + 15 handoff-validator tests)
+3. Inside the container run: `cd /workspace && python3 -m pytest eval/test_policy.py eval/test_deterministic_step.py eval/test_runner_tool.py -q` (expected: 59 passed, including 7 test-runner tool tests; 37 policy + 15 handoff-validator tests)
 4. Try a governance lock: `./scripts/run-agent.sh security-reviewer bash`, then `touch /workspace/x` gives "Read-only file system".
 
 Run `git commit` and `git push` from the host shell, not inside a container.
@@ -89,9 +89,9 @@ This shows the network can be switched off for checks that do not need it. It do
 - `Temporary failure in name resolution` with `--network none` is expected.
 
 ## Honest limits
-- No live end-to-end orchestration run; the orchestrator has no shell tool and `eval/orchestrator.py` is a course simulation.
+- One live orchestration run exists (docs/live-run-record.md), but the orchestrator has no shell tool, so the handoff check was run by hand, and `eval/orchestrator.py` is a course simulation.
 - No API key was registered, so the AI review and rubric have never run.
 - The eval gate replays one saved transcript (HO-01).
 - Skill scope is enforced by instruction plus a policy test, not by a runtime lock.
-- The tester's `test_runner` returns placeholder PASS output.
+- The tester's `test_runner` now runs the mock-based tests of the app (needs mongomock in the image) and returns the real pytest output.
 - This is a fork: PRs on the GitHub UI can default to the parent repo, so check the base repository.

@@ -28,7 +28,7 @@ As a projection, for a team making 10 changes a week, catching half of the quiet
 | Defects avoided | 0.25 per week, about 12 per year | Projection |
 | Hours saved | 0.75 per week, about 38 per year | Projection |
 | Dollars saved | About $37.50 per week, about $1,875 per year | Projection |
-| Running cost of one security review per change | About $2.90 to $3.20 per week | Measured cost of one review run, times 10; the rest of the pipeline is not measured yet |
+| Running cost of one security review per change | About $2.90 to $3.20 per week | Measured cost of one review run, times 10; a full run was measured once, with one session uncosted |
 
 These figures come from assumptions, not measurements. Replace the assumptions with your own team's numbers to get your own estimate.
 
@@ -55,9 +55,9 @@ Risks managed:
 
 Limits:
 
-- The full team has not yet run live from start to finish, so its cost and speed are unknown.
+- The full team has run live once, but one of its sessions was not costed, so its total cost is not known.
 - The automated AI code review has never run, because no access key was set up.
-- The tool that runs tests returns a placeholder pass, so test results are not yet independently verified.
+- The tool that runs tests now runs the mock-based tests of the app for real; tests that need a live database are not run.
 - One automatic check can report success even when what it runs fails. The fix is known and not yet applied.
 - Everything ran on a sample project, not company data. A real rollout would need approvals and cleaned data.
 
@@ -65,7 +65,7 @@ Limits:
 
 The next step is a small trial that turns the assumptions above into measurements.
 
-1. Run the full team once from start to finish with a real test runner, and record its cost and time.
+1. Repeat the full-team run, recording the cost of every session.
 2. Fix the known check gap and limit the working environment's network access.
 3. Try it on a team's real changes for a few weeks and count the real mistakes it catches.
 

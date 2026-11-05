@@ -15,10 +15,10 @@ Use an orchestrator with scoped subagents; each tool has the fewest roles possib
 - One agent for everything. Rejected: the motivating failure above.
 
 ## Consequences
-More handoffs; clearer failure location. The tester's test_runner is a placeholder, so test results are unverified.
+More handoffs; clearer failure location. The tester's test_runner was a placeholder and now runs the mock-based tests of the app (see docs/live-run-record.md).
 
 ## Evidence
 docs/routing-and-tool-grant-map.md; docs/calibration-log.md Cycle 1.
 
 ## Open risks
-No live end-to-end run has exercised the full routing.
+One live run (2026-11-06) exercised the routing once; more runs are needed, and the server trusts the role name a caller supplies.
