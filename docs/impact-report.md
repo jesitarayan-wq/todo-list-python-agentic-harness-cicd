@@ -21,8 +21,8 @@ Of the five measures, quality is measured, defect rate and cost have proxies, an
 | Quality | Run 001: rubric 12/12. Run 002: rubric 11/12 | Holdout, 7 tasks: HO-01 passes 11/11 checks and rubric 4/4 (9/9); HO-03 11/11, rubric 3/4 (9/9); HO-04, HO-06, HO-07 pass 11/11 checks but are weak (records reconstructed, rubric 6/9, 6/9, 5/9) | Measured. Only HO-01 is fully clean |
 | Review latency | About 10 to 15 min (Run 001), about 10 min (Run 002), both estimates | Not re-measured | Not measured |
 | Defect rate | Not available | Not a rate. Defects the gates caught: the reviewer name mismatch, 1 policy failure from a revoked grant, 2 from an over-grant, 1 integrity-job failure (CI #13) | Proxy |
-| Cycle time | Run 001: 18 min 8.375 s. Run 002: 2 min 47.143 s | HO-02 took 356 s, over the 300 s budget (4 sequential agents). Handoff check as code: about 0.18 s. Full pipeline: not run | Partly measured |
-| Cost per run | Run 001: not captured. Run 002: $0.27 (355.2k in, 4.4k out tokens) | Full pipeline: not measured. Single review runs this month: $0.32 and $0.29 (security review, two versions), $0.25 (lint review). Handoff check as code: zero tokens | Proxy |
+| Cycle time | Run 001: 18 min 8.375 s. Run 002: 2 min 47.143 s | HO-02 took 356 s, over the 300 s budget (4 sequential agents). Handoff check as code: about 0.18 s; the same check by an agent: 40 to 65 s wall, three runs. Full pipeline: not run | Partly measured |
+| Cost per run | Run 001: not captured. Run 002: $0.27 (355.2k in, 4.4k out tokens) | Full pipeline: not measured. Single review runs this month: $0.32 and $0.29 (security review, two versions), $0.25 (lint review). Handoff check as code: zero tokens; the same check by an agent: about $0.10 to $0.16 per session, three runs | Proxy |
 
 The single-run costs are session totals read from the Claude Code usage screen on 2026-11-05. They include the main session's own turns and a warm prompt cache, so they show the order of magnitude of one agent step, not the cost of the pipeline.
 
@@ -85,14 +85,14 @@ The projection is only as good as its assumptions. What would make it a measurem
 
 ## What is not measured yet, and how each gap closes
 
-Five gaps remain, and each closes with one specific piece of evidence.
+Five gaps remain; one of them, the handoff check comparison, is now measured on one input.
 
 | Gap | How it closes |
 | --- | --- |
 | Full-pipeline cost and cycle time | One live end-to-end run with a real test runner, recording cost and time from the Claude Code usage screen |
 | Review latency | Time a human reviewer on the same runs |
 | Defect rate | Count defects found over a period of real changes, with the checks on |
-| Handoff check, agent versus script | Have an agent perform the handoff check on three runs; compare latency, tokens and variation with the script (about 0.18 s, zero tokens, identical output on three runs). ADR-003 stays Proposed until then |
+| Handoff check, agent versus script | Measured on 2026-11-05: three agent runs on one input, given only the schema, each judged the bad document valid while the script rejects it (agent 40 to 65 s and about $0.10 to $0.16 per session; script about 0.18 s and zero tokens). Still open: more inputs, and an end-to-end run. ADR-003 stays Proposed until the script is wired into a running workflow |
 | Holdout evidence for HO-04, HO-06 and HO-07 | Those records were reconstructed after early exits. A fresh run that saves every tool call as it happens replaces them |
 
 Also still open: the AI review and the rubric scoring in CI have never run, because no API key was registered.
