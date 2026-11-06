@@ -31,7 +31,7 @@ Six categories scored below 3 at first grading; all six are in progress, and a f
 | --- | --- | --- |
 | Design | 1 | In progress: documents rebuilt with real tables and a drawn diagram, a slide deck built and PDFs exported; the video is to be re-recorded |
 | Stakeholder Communication | 2 | In progress: the one-pager and impact report now give hours, defects and dollars as labelled projections; the video is to be re-recorded |
-| Sandboxed Environment | 2 | In progress: the README now documents the boundaries, a parallel-isolation test and a network test, with evidence (merged to main in pull request 8); the working container still has open network access |
+| Sandboxed Environment | 2 | In progress: the README now documents the boundaries, a parallel-isolation test and a network test, with evidence (merged to main in pull request 8); an opt-in restricted network mode (all HTTPS through an allow-list proxy on an internal network) is built and tested, and the default mode is still open |
 | Right-Tool Decisions and ADRs | 2 | In progress: three agent runs of the handoff check on one input are compared with the script, and the ADR package is rebuilt; the handoff check also ran on a real implementer result in the live run, and more inputs are open |
 | Production Integration and Tool-Evolution Drill | 2 | In progress: one governed run and a plain-agent baseline are recorded with cost and time (docs/live-run-record.md); one session's cost was not captured, and retries and a per-run budget exist only for the CI advisory review call (fallbacks are not built) |
 | Iteration Narrative and Impact | 2 | In progress: the five-measure table, two improvement cycles and a measured baseline run are written; review latency and defect rate are still not measured |
@@ -51,6 +51,6 @@ Still open:
 
 - Repeat the live run with the cost of every session recorded.
 - More inputs for the agent-versus-script handoff comparison (three runs are done on one input).
-- Restricting network access in the working container; the README documents the test and the open access.
+- Making restricted network mode the default after a longer, tool-using session has been tested in it; the default is still open.
 - Fixing the CI evaluation step (`tee` without `pipefail`) and pointing the agents at the governed servers.
 - Re-recording the walkthrough video with the slide deck.
