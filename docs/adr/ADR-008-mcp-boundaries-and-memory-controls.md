@@ -20,4 +20,4 @@ A mechanical check that does not depend on agent judgment. Limit: .git/hooks is 
 docs/memory-architecture.md (Enforcement, Why this exists notes); logs/storage-audit-log.jsonl.
 
 ## Open risks
-The reference memory layer was never populated; stale-entry and scope checks are soft guards.
+The reference memory layer holds 8 lesson files (.memory/reference/). In the live run the retrieval tool was unavailable, so the planner and the reviewer did not consult them. Stale-entry and scope checks are soft guards.
