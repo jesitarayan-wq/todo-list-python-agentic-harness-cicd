@@ -6,7 +6,7 @@ Sagaya Jesita Maria Sarath Raj · 2026-11-05
 
 Failures that used to pass silently are now caught by tests and CI, and one live run of the full team now exists (docs/live-run-record.md), but it is a single run, one session cost was not captured, and review time and defect rate are still not measured.
 
-- **Measured:** 52 automated checks pass; retrieval went from 5/7 to 7/7 after a fix; a revoked permission was caught by exactly one failing policy test (36 passed, then 37 after the fix); the handoff check as code runs in about 0.18 s with zero tokens.
+- **Measured:** 59 automated checks pass (37 policy, 15 handoff-validator, 7 test-runner); retrieval went from 5/7 to 7/7 after a fix; a revoked permission was caught by exactly one failing policy test (36 passed, then 37 after the fix); the handoff check as code runs in about 0.18 s with zero tokens.
 - **Two improvement cycles, each confirmed by a rerun:** the reviewer authorization fix, and the retrieval fix (details below).
 - **Not measured:** review latency and defect rate; full-pipeline cost and cycle time are only partly measured (one governed run). The table below marks each one as measured, a proxy, or not yet measured.
 
