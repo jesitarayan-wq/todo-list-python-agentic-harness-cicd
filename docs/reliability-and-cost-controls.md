@@ -7,10 +7,10 @@
 - Escalation guard: .claude/agents/orchestrator.md halts and escalates to a human if the same phase fails its gate twice in a row.
 - Fail-safe advisory step: the CI advisory-review job has continue-on-error: true, and run-reviewer.py exits 0 and writes "No review was performed" when no key is present.
 - Gates that block: required checks in the protect-main ruleset (Policy Test Suite, Evaluation Harness, Pipeline Integrity Check).
+- Retries with backoff: scripts/run-reviewer.py retries a failed model call up to 3 times (rate limits, server errors, timeouts and network errors; never a client error such as 401), doubles the wait each time, and records every attempt in the review output. Scope: the CI advisory review call only. Tested in eval/test_reviewer_retries.py with a fake sender.
+- Per-run token budget and hard stop: the same script counts the largest answer each attempt could use against a budget of 3600 tokens (REVIEW_TOKEN_BUDGET) and makes no further attempt when the next one would exceed it. Scope: the CI advisory review call only; the budget guards in the live agent run were manual. Tested in eval/test_reviewer_retries.py.
 
 ## Planned, not built
-- Automatic retries with backoff on tool or model failure.
-- Per-workflow token or cost budget and a hard stop.
 - Rate limiting of agent calls.
 - Max-iteration guard on loops other than the two-failure halt.
 - Fallback to deterministic behavior when an agent step fails.

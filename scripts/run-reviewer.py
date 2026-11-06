@@ -17,6 +17,7 @@ import json
 import os
 import subprocess
 import textwrap
+import time
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
@@ -157,6 +158,83 @@ def call_anthropic(prompt: str) -> str:
     return "\n".join(text_parts).strip() or "No review text was returned."
 
 
+RETRYABLE_HTTP_CODES = {429, 500, 502, 503, 504, 529}
+MAX_TOKENS_PER_CALL = 1200
+MAX_ATTEMPTS = int(os.environ.get("REVIEW_MAX_ATTEMPTS", "3"))
+BACKOFF_SECONDS = float(os.environ.get("REVIEW_BACKOFF_SECONDS", "2"))
+WORKFLOW_TOKEN_BUDGET = int(os.environ.get("REVIEW_TOKEN_BUDGET", "3600"))
+
+
+def send_once(prompt: str, api_key: str, model: str) -> str:
+    """Send one request to the model and return its text, or raise on any failure."""
+    payload = {
+        "model": model,
+        "max_tokens": MAX_TOKENS_PER_CALL,
+        "messages": [{"role": "user", "content": prompt}],
+    }
+    request = urllib.request.Request(
+        "https://api.anthropic.com/v1/messages",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "content-type": "application/json",
+            "x-api-key": api_key,
+            "anthropic-version": "2023-06-01",
+        },
+        method="POST",
+    )
+    with urllib.request.urlopen(request, timeout=90) as response:
+        data = json.loads(response.read().decode("utf-8"))
+    blocks = data.get("content", [])
+    text_parts = [b.get("text", "") for b in blocks if b.get("type") == "text"]
+    return "\n".join(text_parts).strip() or "No review text was returned."
+
+
+def is_retryable(exc: Exception) -> bool:
+    """Retry rate limits, server errors and network problems; never retry a client error."""
+    if isinstance(exc, urllib.error.HTTPError):
+        return exc.code in RETRYABLE_HTTP_CODES
+    return isinstance(exc, (urllib.error.URLError, TimeoutError, ConnectionError))
+
+
+def call_with_retries(prompt, send=send_once, sleep=time.sleep, max_attempts=None, backoff=None, budget=None) -> str:
+    """Call the model with a limited number of retries and a per-run token budget.
+
+    The budget counts the largest answer each attempt could use, so it is an upper bound.
+    Every failed or skipped attempt is recorded in the text that is returned."""
+    if not os.environ.get("ANTHROPIC_API_KEY", "").strip():
+        return call_anthropic(prompt)
+    max_attempts = MAX_ATTEMPTS if max_attempts is None else max_attempts
+    backoff = BACKOFF_SECONDS if backoff is None else backoff
+    budget = WORKFLOW_TOKEN_BUDGET if budget is None else budget
+    api_key = os.environ["ANTHROPIC_API_KEY"].strip()
+    model = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-6")
+    log: list[str] = []
+    spent = 0
+    for attempt in range(1, max_attempts + 1):
+        if spent + MAX_TOKENS_PER_CALL > budget:
+            log.append(f"attempt {attempt} was not made: the run budget of {budget} tokens would be exceeded")
+            break
+        spent += MAX_TOKENS_PER_CALL
+        try:
+            text = send(prompt, api_key, model)
+        except Exception as exc:
+            if isinstance(exc, urllib.error.HTTPError):
+                reason = f"HTTP {exc.code}"
+            else:
+                reason = f"{type(exc).__name__}: {str(exc)[:200]}"
+            log.append(f"attempt {attempt} failed ({reason})")
+            if not is_retryable(exc) or attempt == max_attempts:
+                break
+            wait = backoff * (2 ** (attempt - 1))
+            log.append(f"waited {wait:g} s")
+            sleep(wait)
+            continue
+        if log:
+            text += "\n\n_Call log: " + "; ".join(log) + f"; attempt {attempt} succeeded._\n"
+        return text
+    return "## Advisory Code Review\n\nNo review was produced.\n\n" + "\n".join(f"- {entry}" for entry in log) + "\n"
+
+
 def main() -> int:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -203,7 +281,7 @@ def main() -> int:
             """
         ).strip()
 
-        review = call_anthropic(prompt)
+        review = call_with_retries(prompt)
 
     (OUT_DIR / "review-output.md").write_text(review + "\n", encoding="utf-8")
 

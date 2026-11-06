@@ -8,7 +8,7 @@ Task, given to both runs: implement `TaskDAO.update(object_id, data)` in `task.p
 - Cost limit: stop if the session cost passed $3.00. Not reached.
 - Human approval: the plan was shown and approved before any code was written.
 - Escalation: the orchestrator halts if one phase fails its gate twice. Not triggered, because no phase failed.
-- Retries and fallbacks: not exercised in this run. They are still planned, not built.
+- Retries and fallbacks: not exercised in the live agent run. Retries and a per-run token budget were added afterwards to the CI advisory review call (see docs/reliability-and-cost-controls.md); fallbacks are still planned.
 
 ## Governed run (orchestrator, planner, implementer, reviewer, tester)
 
@@ -99,7 +99,7 @@ Failures and refusals observed:
 - In the baseline, the agent's own local `pytest` run had not finished after 120 seconds and was stopped when the session exited; the reason was not determined.
 - In the baseline, the plain agent called `test_runner`, which only the tester role is allowed to use. The server checks the role name the caller supplies, and the role the agent supplied was not recorded. This is an open risk (see ADR-006).
 
-Retries: none. No phase failed its gate twice, so the escalation guard did not fire. Automatic retries are still not built.
+Retries: none. No phase failed its gate twice, so the escalation guard did not fire. Automatic retries were not part of the agent run; they were added afterwards to the CI advisory review call (see docs/reliability-and-cost-controls.md).
 
 Rollbacks: none. Nothing was reverted. The application code from both runs was kept as diffs in `docs/live-run/` and was not merged into the repository.
 
