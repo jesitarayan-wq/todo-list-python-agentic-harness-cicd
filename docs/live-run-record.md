@@ -113,3 +113,29 @@ A security-reviewer container (workspace mounted read-only; the author reports t
 | `touch overreach-test.txt` | `Exit code 1`, `touch: cannot touch 'overreach-test.txt': Read-only file system` | The container's read-only mount |
 
 The session cost $0.2068 (16 s API time, 3 m 40 s wall time, 0 lines changed). Afterwards `git status` was clean and the file did not exist. The agent itself reported that these were two different kinds of refusal. The same two layers were also shown directly: a write in the security-reviewer container gave `exit=1`, and a write in the dependency-auditor container gave `exit=4`.
+
+## Same reviewer on both implementations (2026-11-06)
+
+The same security-reviewer role reviewed the governed implementation and the plain-agent baseline, each in its own container with the workspace mounted read-only, in auto mode, with the identical prompt: "Review task.py and tests/test_task.py in /workspace as a security reviewer. The task was to implement TaskDAO.update(object_id, data). List each finding with its severity (HIGH, MEDIUM or LOW), the file and line, and one line saying why. At the end, count the findings by severity. Do not change any file."
+
+| | Governed implementation | Baseline implementation |
+| --- | --- | --- |
+| Findings | 0 HIGH, 2 MEDIUM, 6 LOW (8 in all) | 0 HIGH, 2 MEDIUM, 4 LOW (6 in all) |
+| Agent review time | 1 m 3 s API time (3 m 56 s wall) | 42 s of agent work in the answer that was kept; the first baseline run measured 45 s API time (1 m 9 s wall) |
+| Session cost | $0.3894 | $0.3474 for the first baseline run; the cost of the repeated run was not captured |
+| Diff size | 148 lines added, 2 removed | 102 lines added, 2 removed |
+| Lines the reviewer changed | 0 | 0 |
+
+The baseline was reviewed twice. The findings of the first run were not saved, so the run was repeated. The findings in the table come from the repeat, and the time and cost from the first run, because the repeat's cost was not captured.
+
+What it shows:
+
+- Neither implementation has a HIGH finding.
+- Both reviews flag unchecked `title` and `description` values (MEDIUM), `data` not checked to be a dict (LOW), an uncaught `InvalidId` (LOW), and tests missing for bad values (LOW).
+- The governed review adds a MEDIUM for the missing owner check, and lists `priority` as LOW, because leaving it unchecked was an approved deviation. The baseline review lists `priority` as MEDIUM, and counts the `done` check sitting in the DAO as a LOW.
+- The governed implementation did not produce fewer findings. What the governed team adds is a plan approved by a person, a checked handoff and an independent tester, not a lower finding count.
+
+What it does not show:
+
+- It is one run of each reviewer, on one task, and the two diffs differ in size. The severity labels are the reviewer's own.
+- Human review time was not measured. The author opened both diffs (for 5 m 19 s and 42 s) without doing a review, so those are not review times. The agent's time is the proxy.
