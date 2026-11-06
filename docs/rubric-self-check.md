@@ -38,7 +38,7 @@ Six categories scored below 3 at first grading; all six are in progress, and a f
 | Workflow Scoping | 3 | Optional, open: quantify the before-state pain and argue why a custom pipeline beats a prebuilt agent or a script |
 | Quality Spec and Baseline | 3 | Optional, open: tie the thresholds to business outcomes |
 | Orchestration and MCP Tools | 3 | Optional, open: point the agents at the governed servers; `.mcp.json` still lists the older ones |
-| Governance, Security and CI/CD | 3 | Optional, in progress: an agent's overreach attempt was tested and refused twice (the allow-list, then the read-only mount), and is to be shown in the video; approvals, retries and rollbacks are not logged; one CI step gap is known |
+| Governance, Security and CI/CD | 3 | Optional, in progress: an agent's overreach attempt was tested and refused twice (the allow-list, then the read-only mount), and is to be shown in the video; approvals, failures, retries and rollbacks are logged for the live run (docs/live-run-record.md); one CI step gap is known |
 | Clarity and Flow | 3 | In progress: the slide deck follows the required sequence |
 | Agent, Skills and Memory | 4 | No change needed |
 | Evaluation and Calibration | 4 | No change needed |
