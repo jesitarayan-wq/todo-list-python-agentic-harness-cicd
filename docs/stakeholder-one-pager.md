@@ -66,7 +66,7 @@ Limits:
 The next step is a small trial that turns the assumptions above into measurements.
 
 1. Repeat the full-team run, recording the cost of every session.
-2. Fix the known check gap and limit the working environment's network access.
+2. Fix the known check gap, and make the new restricted network mode the default after more testing.
 3. Try it on a team's real changes for a few weeks and count the real mistakes it catches.
 
 To start, a decision-maker would need to approve the trial and provide access for the AI code review.

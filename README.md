@@ -39,7 +39,7 @@ Checked on 2026-11-05 with the image `todo-agent-m4` and `scripts/run-agent.sh`.
 | --- | --- | --- |
 | Filesystem | Only the current folder is mounted, at `/workspace`. It is read-only for security-reviewer, planner, test-coverage-analyzer, tester, project-manager and dependency-auditor, and read-write for implementer and orchestrator. No home folder, `/c` or `/Users` is visible | `logs/` is mounted read-write for every role so refusals can be logged. Container-local paths such as `/tmp` stay writable |
 | Memory | `.memory/` is mounted only for implementer and orchestrator | |
-| Network | The default Docker network. Outbound access is open in the working container, because an agent session must reach Claude. Ports 8501 and 8502 are published | A misbehaving agent could send project files out. An allow-list proxy is the planned fix and is not built yet |
+| Network | Default (open) mode: the default Docker network, outbound access open because an agent session must reach Claude, ports 8501 and 8502 published. Opt-in restricted mode (AGENT_NETWORK=restricted): an internal network with HTTPS only through an allow-list proxy that logs every decision (see docs/network-isolation-verification.md) | A misbehaving agent could send project files out. An allow-list proxy is the planned fix and is not built yet |
 | Credentials | The Claude login lives in a named volume (`claude-auth`), not in the image. `OPENROUTER_API_KEY` is passed through only if set on the host. Slack values default to placeholders | |
 
 ### Test 1: parallel sessions are isolated
@@ -75,7 +75,17 @@ docker run --rm --entrypoint python3 todo-agent-m4 -c "import urllib.request; pr
 - With `--network none`: `urllib.error.URLError: <urlopen error [Errno -3] Temporary failure in name resolution>`, exit 1.
 - With the default network (the control): `200`, exit 0.
 
-This shows the network can be switched off for checks that do not need it. It does not restrict the working agent container, which still has open outbound access.
+This shows the network can be switched off for checks that do not need it. The working agent container can be restricted with the opt-in restricted network mode described next; in the default open mode, outbound access stays open.
+
+### Restricted network mode (opt-in)
+
+```
+./scripts/start-egress-proxy.sh enforce
+AGENT_NETWORK=restricted ./scripts/run-agent.sh security-reviewer bash
+./scripts/start-egress-proxy.sh stop
+```
+
+In restricted mode the container joins an internal Docker network with no route to the internet, and all HTTPS goes through an allow-list proxy (`config/egress-allow-list.txt`) that refuses other hosts and logs every decision. A session worked with only `api.anthropic.com` and `platform.claude.com` on the list, and the proxy refused update, telemetry and other lookups. The default is still `open`. Evidence, the host list and the limits are in `docs/network-isolation-verification.md`.
 
 ### Prerequisite check
 

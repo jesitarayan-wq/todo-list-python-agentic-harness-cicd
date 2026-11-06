@@ -1,0 +1,5 @@
+# Hosts that agent containers in restricted network mode may reach, through the egress proxy.
+# One host per line. *.example.com matches subdomains. Only HTTPS (port 443) is tunnelled.
+# Found with the proxy in learn mode (see docs/network-isolation-verification.md).
+api.anthropic.com        # the model API
+platform.claude.com      # login and token refresh
