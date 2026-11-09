@@ -20,7 +20,7 @@ Seven of the 14 required items are met and seven are partly met; none is a gap n
 | Impact report with the required metrics | Impact report (the live run and baseline measured once; review latency and defect rate not measured; proxies named) | Partly met |
 | Governance stopping an over-reaching agent | `eval/red-team-results.md`, `enforcement-verification.md`, storage audit-log denials | Met |
 | Architecture write-up, one-pager, runbook | Architecture write-up, stakeholder one-pager, runbook | Met |
-| Walkthrough video and PDFs | Video recorded 2026-10-31. The first PDFs were browser printouts; formatted PDFs and a slide deck have been built, and the video is to be re-recorded with the slides | Partly met |
+| Walkthrough video and PDFs | The first video was recorded 2026-10-31. The first PDFs were browser printouts; formatted PDFs and a slide deck have been built, and the video was re-recorded with the slides; it shows the live run up to the plan checkpoint, the agent overreach test and the network refusal, and the full run is in the live-run record | Partly met |
 | Sanitization | `docs/sanitization-note.md` (scan results and what it does not cover) | Met |
 
 ## Against the grader's feedback
@@ -29,8 +29,8 @@ Six categories scored below 3 at first grading; all six are in progress, and a f
 
 | Category | First score | Revision status |
 | --- | --- | --- |
-| Design | 1 | In progress: documents rebuilt with real tables and a drawn diagram, a slide deck built and PDFs exported; the video is to be re-recorded |
-| Stakeholder Communication | 2 | In progress: the one-pager and impact report now give hours, defects and dollars as labelled projections; the video is to be re-recorded |
+| Design | 1 | In progress: documents rebuilt with real tables and a drawn diagram, a slide deck built and PDFs exported; the video was re-recorded with the slides |
+| Stakeholder Communication | 2 | In progress: the one-pager and impact report now give hours, defects and dollars as labelled projections; the video was re-recorded with the slides |
 | Sandboxed Environment | 2 | In progress: the README now documents the boundaries, a parallel-isolation test and a network test, with evidence (merged to main in pull request 8); an opt-in restricted network mode (all HTTPS through an allow-list proxy on an internal network) is built and tested, and the default mode is still open |
 | Right-Tool Decisions and ADRs | 2 | In progress: three agent runs of the handoff check on one input are compared with the script, and the ADR package is rebuilt; the handoff check also ran on a real implementer result in the live run, and more inputs are open |
 | Production Integration and Tool-Evolution Drill | 2 | In progress: one governed run and a plain-agent baseline are recorded with cost and time (docs/live-run-record.md); one session's cost was not captured, and retries and a per-run budget exist only for the CI advisory review call (fallbacks are not built) |
@@ -53,4 +53,4 @@ Still open:
 - More inputs for the agent-versus-script handoff comparison (three runs are done on one input).
 - Making restricted network mode the default after a longer, tool-using session has been tested in it; the default is still open.
 - Fixing the CI evaluation step (`tee` without `pipefail`) and pointing the agents at the governed servers.
-- Re-recording the walkthrough video with the slide deck.
+- Showing the complete live run on camera, not only the plan checkpoint.

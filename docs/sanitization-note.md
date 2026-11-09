@@ -37,6 +37,6 @@ These matches look like secrets but are not.
 - `.gitignore` has no `*.bak` rule (only `env.bak/` and `venv.bak/`). No `.bak` file is tracked, and files are added to commits by name, never with `git add .`.
 - The scan reads tracked files only. `docs/live-run/live-run-session-2.txt` holds the full text of one agent session; it was searched for secret patterns on 2026-11-06 and showed no real match, and it should not be copied outside the repository.
 
-## Still to do before resubmission
+## Checks before resubmission
 
-- Check that the re-recorded video shows no token, private page or inbox.
+- The author watched the re-recorded video once before submission, looking for tokens, login codes, email addresses, private pages and inboxes.
